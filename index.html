@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shift Watch</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#151520"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{color-scheme:dark;--bg:#151520;--bg2:#0a0a14;--line:#26263a;--g:#1c8f3f;--gb:#09ff1a;--tx:#9a9ab0;--or:#ff9800;--red:#e5484d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 Roboto,system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:28px 22px 60px}
+h1,h2{margin:0;color:var(--g);letter-spacing:-.02em}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top h1{font-size:34px}.ib{display:flex;gap:8px}
+button{font:inherit;cursor:pointer;border:0}
+.sq{width:46px;height:46px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);color:var(--g);font-size:20px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0}
+.row p{margin:0;font-size:17px}
+.pill{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:10px 16px;text-align:center;min-width:110px}
+.pill b{display:block;color:var(--gb);font-size:22px}.pill small{display:block;font-size:13px}
+#clock{font-size:clamp(52px,17vw,88px);color:var(--g);font-weight:300;font-variant-numeric:tabular-nums;margin:6px 0 0;white-space:nowrap}
+.lab{font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
+.earn{margin:22px 0;padding:34px 26px 38px;border-radius:26px;background:linear-gradient(135deg,#0ff51f,#2fae3a 45%,#3d6e47);color:#fff}
+.earn b{display:block;font-size:52px;line-height:1.1}.earn span{font-size:19px}
+.in{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;color:var(--g);font:inherit;font-size:26px;padding:16px 18px}
+input,textarea{font-family:inherit}
+details{background:var(--bg2);border:1px solid var(--line);border-radius:16px;margin:22px 0;padding:18px;color:var(--gb)}
+details summary{font-size:20px;font-weight:500;cursor:pointer}
+details .in{font-size:18px;margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.b{padding:18px;border-radius:14px;font-weight:700;font-size:18px;color:#fff}
+.b.pause{background:#2a6b35}.b.brk{background:var(--or)}.b.rst{background:var(--bg2);color:var(--g);border:1px solid var(--line)}.b.sv{background:#188a3d}
+.b.act{outline:3px solid #fff}
+.goal{margin:30px -8px 0;padding:34px 24px;background:linear-gradient(135deg,#1f7a42,#37506c);display:flex;justify-content:space-between;gap:12px;color:#fff}
+.goal .lab{color:#cfe6d6}.goal b{display:block;font-size:44px;margin:8px 0}.goal p{margin:0;font-size:18px}
+.bar{height:14px;border-radius:9px;background:var(--bg2);margin:8px 0}.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--gb),#2e6e38);width:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:34px 12px;margin:36px 0}
+.stats b{display:block;color:var(--g);font-size:38px}
+.stack{text-align:center;margin:30px 0}.stack b{display:block;color:var(--g);font-size:28px;margin-top:6px}
+.shift{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0}
+.shift h3{margin:0 0 6px;color:var(--g);font-size:21px}.shift p{margin:0;font-size:16px}
+.shift .amt{color:var(--gb);font-size:26px;font-weight:700}
+.shift .del{background:none;color:var(--tx);font-size:22px;padding:6px}
+.link{background:none;color:var(--tx);letter-spacing:.14em;font-weight:500;font-size:14px}
+.modal{position:fixed;inset:0;background:var(--bg);overflow:auto;display:none;z-index:20;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.modal.on{display:block}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0}
+.mh h2{font-size:30px}.mh button{background:none;color:var(--tx);font-size:28px}
+.sec{padding:30px 22px 6px;max-width:520px;margin:0 auto}.sec h2{font-size:26px;margin-bottom:6px}.sec p{margin:0 0 14px}
+.go{width:100%;padding:18px;border-radius:14px;background:var(--gb);color:#fff;font-weight:700;font-size:19px;margin-top:14px}
+.go.or{background:var(--or)}
+.tog{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0}.tog h3{margin:0;color:var(--g);font-size:20px}.tog p{margin:2px 0 0;font-size:16px}
+.tog input{appearance:none;width:62px;height:34px;border-radius:17px;background:#333;position:relative;flex:none}
+.tog input::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;transition:.15s}
+.tog input:checked{background:var(--gb)}.tog input:checked::after{left:31px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mini{display:flex;gap:8px;margin:10px 0}.mini button{background:var(--bg2);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:10px 16px;font-weight:500}
+small.n{display:block;font-size:15px;margin:12px 0}
+.tsel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.tsel .in{margin-top:12px;font-size:20px;padding:14px 8px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--bg);border-radius:16px;padding:10px;margin-top:14px}.tabs button{background:none;color:var(--tx);border-radius:12px;padding:16px 4px;font-weight:700;font-size:17px;line-height:1.2}.tabs button.on{background:var(--gb);color:#fff}#armed div{margin-top:14px;font-size:16px;color:var(--tx)}#armed button{background:var(--bg);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:6px 12px;margin-left:8px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
+.toast.on{opacity:1}
+</style></head><body>
+<main>
+<div class="top"><h1>Shift Timer</h1><div class="ib"><a class="sq" id="bCoffee" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" aria-label="Buy me a coffee" style="display:flex;align-items:center;justify-content:center;text-decoration:none">☕</a><button class="sq" id="bShare" aria-label="Share">⇪</button><button class="sq" id="bMenu" aria-label="Options">≡</button></div></div>
+<div class="row"><p>Track a shift, take breaks, and save it to your week.</p><div class="pill" id="pill" role="button" tabindex="0" aria-label="Open floating countdown" style="cursor:pointer"><b id="toGo">$0.00</b><small>TO GO</small><small id="toGoT">00:00:00</small></div></div>
+<div id="clock">00:00:00</div><div class="lab" style="margin-top:12px">Elapsed time</div>
+<div class="earn"><b id="earn">$0.00</b><span>Earned so far</span></div>
+<div class="lab" style="color:var(--g)">Hourly rate</div>
+<div style="margin-top:12px;position:relative"><input class="in" id="rate" inputmode="decimal" value="25.10" aria-label="Hourly rate" style="padding-left:50px"><span style="position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:26px">$</span></div>
+<details id="sched"><summary>Schedule a punch / missed start</summary>
+<div class="tabs" id="tabs"><button data-m="auto" class="on">Auto-start</button><button data-m="brk">Break</button><button data-m="miss">Missed start</button></div>
+<p id="schedTxt" style="margin:16px 0 0;font-size:17px;color:var(--tx)"></p>
+<input class="in" type="date" id="sD"><div class="tsel"><select class="in" id="sH" aria-label="Hour"></select><select class="in" id="sM" aria-label="Minute"></select><select class="in" id="sP" aria-label="AM or PM"><option>AM</option><option>PM</option></select></div>
+<div class="mini"><button id="sToday">Today</button><button id="sYest">Yesterday</button></div>
+<button class="go" id="startBtn">Arm timer</button><div id="armed"></div></details>
+<div class="grid"><button class="b pause" id="bPause">Start</button><button class="b brk" id="bBreak">Break · 30 min</button><button class="b rst" id="bReset">Reset</button><button class="b sv" id="bSave">Save Shift</button></div>
+
+<div class="goal"><div><div class="lab" id="goalLab">10-hour goal</div><b id="goalAmt">$0.00</b><p id="goalTxt"></p></div></div>
+<div style="display:flex;justify-content:space-between;color:var(--g);margin-top:26px;font-size:20px"><span id="goalEarned">$0.00 earned</span><span id="goalPct">0%</span></div>
+<div class="bar"><i id="goalBar"></i></div>
+
+<div class="stats">
+<div><div class="lab">This week</div><b id="wkAmt">$0.00</b><span id="wkHrs">0.0 hrs</span></div>
+<div><div class="lab">All time</div><b id="allAmt">$0.00</b><span id="allHrs">0.0 hrs</span></div>
+<div><div class="lab">Week shifts</div><b id="wkN">0</b></div>
+<div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div>
+
+<div class="stack"><div class="lab">Paycheck stack</div>
+<svg width="150" height="110" viewBox="0 0 150 110" style="margin-top:14px" aria-hidden="true"><g fill="#22c55e" stroke="#15803d" stroke-width="3"><rect x="14" y="62" width="122" height="32" rx="5"/><rect x="14" y="50" width="122" height="32" rx="5"/><rect x="14" y="38" width="122" height="32" rx="5"/><rect x="14" y="26" width="122" height="32" rx="5"/></g><ellipse cx="75" cy="42" rx="18" ry="11" fill="#16a34a"/></svg>
+<b id="stackAmt">$0.00</b></div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
+<div id="list"></div>
+<p style="text-align:center;margin-top:40px">Overtime, missed punches, and shift notes now live in the menu above.</p>
+<p style="text-align:center;border-top:1px solid var(--line);padding-top:30px;margin-top:30px">Shift Watch — track your hours, see what you earn.</p>
+</main>
+
+<div class="modal" id="modal">
+<div class="mh"><h2>Options</h2><button id="mClose" aria-label="Close">✕</button></div>
+<div class="sec"><h2>Shift notes</h2><p>Jot down what you worked on — it attaches when you save the shift.</p>
+<textarea class="in" id="notes" rows="4" style="font-size:18px" placeholder="e.g. Covered the front counter, trained the new hire…"></textarea>
+<small class="n">Saved automatically and cleared once the shift is saved.</small></div>
+<div class="sec"><h2>Add a missed punch</h2><p>Forgot to start or stop the timer? Log that shift by hand.</p>
+<div class="lab">Clocked in</div><input class="in" type="date" id="inD" style="font-size:20px;margin-top:10px"><input class="in" type="time" id="inT" style="font-size:20px">
+<div class="lab" style="margin-top:20px">Clocked out</div><input class="in" type="date" id="outD" style="font-size:20px;margin-top:10px"><input class="in" type="time" id="outT" style="font-size:20px">
+<div class="lab" style="margin-top:20px">Unpaid break (min)</div><input class="in" type="number" id="mBrk" value="0" style="font-size:20px;margin-top:10px">
+<button class="go" id="addShift">Add shift</button></div>
+<div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
+<div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
+<div class="sec"><h2>Goal widget</h2><p>Keep your “to go” amount on the home-screen app icon while you work.</p>
+<div class="tog"><div><h3>Goal on app icon</h3><p>Shows whole dollars left to a 10-hour shift.</p></div><input type="checkbox" id="optBadge" checked></div>
+<div class="tog"><div><h3>Live notification</h3><p>Keeps “$ to go” and time left in your notification shade while a shift runs.</p></div><input type="checkbox" id="optLive"></div>
+<div class="tog"><div><h3>Notify at goal</h3><p>A one-time alert when you hit the full shift.</p></div><input type="checkbox" id="optNotify" checked></div>
+<button class="go" id="pipBtn">Open floating countdown</button><small class="n">Shows money to go and time to go in a small window that floats over other apps. Tapping the TO GO box at the top does the same.</small>
+<small class="n">App icons can only show a number, so the icon badge carries dollars left. The live notification carries dollars and time left. A website can’t draw a true home-screen widget. The app icon badge needs Shift Watch installed to your home screen. Notifications need permission and only arrive while the app is open or in the background.</small></div>
+<div class="sec" style="padding-bottom:60px"><div class="tog"><div><h3>Overtime pay</h3><p>Extra rate after the weekly hours below.</p></div><input type="checkbox" id="optOT" checked></div>
+<div class="two"><div><div class="lab">After (hrs/wk)</div><input class="in" type="number" id="otAfter" value="40" style="font-size:22px;margin-top:10px"></div>
+<div><div class="lab">Rate multiplier</div><input class="in" type="number" step="0.1" id="otMult" value="1.5" style="font-size:22px;margin-top:10px"></div></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='shiftwatch.v1';
+let S={shifts:[],run:null,rate:'25.10',notes:'',opt:{badge:true,notify:true,ot:true,otAfter:40,otMult:1.5}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const BREAK=30*60000,GOAL_H=10;
+const rate=()=>parseFloat($('rate').value)||0;
+const money=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const hms=ms=>{ms=Math.max(0,Math.floor(ms/1000));const p=n=>String(n).padStart(2,'0');return p(Math.floor(ms/3600))+':'+p(Math.floor(ms%3600/60))+':'+p(ms%60)};
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}
+function weekStart(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-x.getDay());return x.getTime()}
+function elapsed(){const r=S.run;if(!r)return 0;
+ if(r.brkAt&&Date.now()-r.brkAt>=BREAK){r.brkTotal=(r.brkTotal||0)+BREAK;r.brkAt=null;save();toast('Break over. Pay is running again')}
+ const now=r.pausedAt||r.brkAt||Date.now();return now-r.start-r.paused-(r.brkTotal||0)}
+function weekHours(excludeId){const ws=weekStart(Date.now());return S.shifts.filter(s=>s.start>=ws&&s.id!==excludeId).reduce((a,s)=>a+s.worked/3600000,0)}
+function pay(ms,r,priorHrs){const h=ms/3600000;if(!S.opt.ot)return h*r;const lim=S.opt.otAfter,m=S.opt.otMult;const reg=Math.max(0,Math.min(h,lim-priorHrs));return reg*r+(h-reg)*r*m}
+function tick(){
+ runSched();
+ const e=elapsed(),r=rate(),run=S.run;
+ const earned=Math.max(0,pay(e,r,weekHours()));
+ $('clock').textContent=hms(e);$('earn').textContent=money(earned);$('stackAmt').textContent=money(earned);
+ const goal=r*GOAL_H,left=Math.max(0,goal-earned);
+ $('toGo').textContent=money(left);$('toGoT').textContent=hms(left/(r||1)*3600000);
+ $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr';
+ const pct=goal?Math.min(100,Math.round(earned/goal*100)):0;
+ $('goalEarned').textContent=money(earned)+' earned';$('goalPct').textContent=pct+'%';$('goalBar').style.width=pct+'%';
+ $('bPause').textContent=!run?'Start':run.pausedAt?'Resume':'Pause';
+ const onB=!!(run&&run.brkAt);$('bBreak').classList.toggle('act',onB);$('bBreak').textContent=onB?'On break '+hms(BREAK-(Date.now()-run.brkAt)).slice(3)+' · tap to end':'Break · 30 min';
+ drawPip();
+ liveNote(run,left);
+ if(S.opt.badge&&navigator.setAppBadge){try{run?navigator.setAppBadge(Math.ceil(left)):navigator.clearAppBadge()}catch(x){}}
+ if(run&&S.opt.notify&&left<=0&&!run.notified&&goal>0){run.notified=true;save();toast('Goal reached!');try{if(Notification.permission==='granted')new Notification('Shift Watch',{body:'You hit '+money(goal)+'.'})}catch(x){}}
+}
+function render(){
+ const ws=weekStart(Date.now()),wk=S.shifts.filter(s=>s.start>=ws);
+ const sum=a=>a.reduce((t,s)=>t+s.pay,0),hrs=a=>a.reduce((t,s)=>t+s.worked,0)/3600000;
+ $('wkAmt').textContent=money(sum(wk));$('wkHrs').textContent=hrs(wk).toFixed(1)+' hrs';
+ $('allAmt').textContent=money(sum(S.shifts));$('allHrs').textContent=hrs(S.shifts).toFixed(1)+' hrs';
+ $('wkN').textContent=wk.length;$('avg').textContent=money(S.shifts.length?sum(S.shifts)/S.shifts.length:0);
+ const t=ms=>new Date(ms).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+ const d=ms=>new Date(ms).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+ $('list').innerHTML='';
+ [...S.shifts].sort((a,b)=>b.start-a.start).forEach(s=>{
+  const el=document.createElement('div');el.className='shift';
+  const l=document.createElement('div');
+  const h=document.createElement('h3');h.textContent=d(s.start);
+  const p=document.createElement('p');p.textContent=t(s.start)+' – '+t(s.end)+' · '+hms(s.worked)+' worked · '+hms(s.brk)+' break · '+money(s.rate)+'/hr';
+  l.append(h,p);
+  if(s.note){const n=document.createElement('p');n.textContent=s.note;n.style.marginTop='6px';n.style.fontStyle='italic';l.append(n)}
+  const a=document.createElement('div');a.className='amt';a.textContent=money(s.pay);
+  const x=document.createElement('button');x.className='del';x.textContent='🗑';x.setAttribute('aria-label','Delete shift');
+  x.onclick=()=>{if(confirm('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==s.id);save();render()}};
+  el.append(l,a,x);$('list').append(el)});
+ if(!S.shifts.length){$('list').innerHTML='<p>No saved shifts yet. Start the timer to log your first one.</p>'}
+ tick();
+}
+function startRun(at){S.run={start:at,paused:0,pausedAt:null,brkAt:null,brkTotal:0,notified:false};save();tick()}
+$('bPause').onclick=()=>{
+ const r=S.run;if(!r)return startRun(Date.now());
+ if(r.brkAt)return toast('End your break first');
+ if(r.pausedAt){r.paused+=Date.now()-r.pausedAt;r.pausedAt=null}else r.pausedAt=Date.now();save();tick()};
+$('bBreak').onclick=()=>{const r=S.run;if(!r)return toast('Start the timer first');
+ if(r.pausedAt)return toast('Resume the timer first');
+ if(r.brkAt){r.brkTotal=(r.brkTotal||0)+(Date.now()-r.brkAt);r.brkAt=null}else r.brkAt=Date.now();
+ save();tick()};
+$('bReset').onclick=()=>{if(S.run&&!confirm('Reset the current shift?'))return;S.run=null;save();tick()};
+S.sched=S.sched||{};
+const MODES={auto:{t:'Set a future clock-in and the timer starts counting on its own the moment that time arrives.',b:'Arm timer',h:'17:00'},brk:{t:'Set your break time ahead and the 30-minute break starts on its own when it arrives, even if the app is closed.',b:'Schedule break',h:'12:00'},miss:{t:'Set when you really clocked in and the running clock will catch up to now.',b:'Catch up clock',h:'08:00'}};
+let mode='auto';
+const lday=o=>{const d=new Date();d.setDate(d.getDate()-o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const sH=$('sH'),sM=$('sM'),sP=$('sP');for(let i=1;i<=12;i++)sH.add(new Option(i,i));for(let i=0;i<60;i++)sM.add(new Option(String(i).padStart(2,'0'),i));
+function setT(v){const[h,m]=v.split(':').map(Number);sP.value=h>=12?'PM':'AM';sH.value=h%12||12;sM.value=m}
+function getT(){let h=+sH.value%12;if(sP.value==='PM')h+=12;return String(h).padStart(2,'0')+':'+String(sM.value).padStart(2,'0')}
+function setMode(m){mode=m;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));$('schedTxt').textContent=MODES[m].t;$('startBtn').textContent=MODES[m].b;$('sD').value=lday(0);setT(MODES[m].h)}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+$('sToday').onclick=()=>{$('sD').value=lday(0)};$('sYest').onclick=()=>{$('sD').value=lday(1)};
+$('startBtn').onclick=()=>{
+ const ms=new Date($('sD').value+'T'+getT()).getTime();if(isNaN(ms))return toast('Pick a date and time');
+ if(mode==='miss'){if(ms>Date.now())return toast('That time is in the future');if(S.run)S.run.start=ms;else startRun(ms);save();tick();toast('Clock caught up');return}
+ if(ms<=Date.now())return toast('Pick a time in the future');
+ S.sched[mode]=ms;save();tick();toast(mode==='auto'?'Timer armed':'Break scheduled')};
+$('armed').onclick=e=>{const k=e.target.dataset&&e.target.dataset.c;if(k){delete S.sched[k];save();tick()}};
+function runSched(){const s=S.sched,n=Date.now();
+ if(s.auto&&n>=s.auto){const at=s.auto;delete s.auto;save();if(!S.run){startRun(at);toast('Timer started')}}
+ if(s.brk&&n>=s.brk){const at=s.brk,r=S.run;delete s.brk;if(r&&!r.pausedAt&&!r.brkAt&&at>=r.start)r.brkAt=at;save()}
+ const f=ms=>new Date(ms).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'});
+ const h=['auto','brk'].filter(k=>s[k]).map(k=>'<div>'+(k==='auto'?'Auto-start':'Break')+' set for '+f(s[k])+' <button data-c="'+k+'">Cancel</button></div>').join('');
+ if($('armed').dataset.h!==h){$('armed').dataset.h=h;$('armed').innerHTML=h}}
+let pipV=null;const pc=document.createElement('canvas');pc.width=480;pc.height=270;
+function drawPip(){if(!pipV)return;const c=pc.getContext('2d'),w=pc.width;
+ c.fillStyle='#0a0a14';c.fillRect(0,0,w,pc.height);c.textAlign='center';
+ c.fillStyle='#09ff1a';c.font='700 96px Roboto,system-ui,sans-serif';c.fillText($('toGo').textContent,w/2,125);
+ c.fillStyle='#9a9ab0';c.font='500 26px Roboto,system-ui,sans-serif';c.fillText('TO GO',w/2,165);
+ c.fillStyle='#1c8f3f';c.font='300 64px Roboto,system-ui,sans-serif';c.fillText($('toGoT').textContent,w/2,240)}
+async function openPip(){
+ if(!pc.captureStream||!('requestPictureInPicture' in HTMLVideoElement.prototype))return toast('This browser can’t show a floating window');
+ try{if(document.pictureInPictureElement){await document.exitPictureInPicture();return}
+  if(!pipV){pipV=document.createElement('video');pipV.muted=true;pipV.playsInline=true;pipV.srcObject=pc.captureStream(5);pipV.style.cssText='position:fixed;right:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none';document.body.append(pipV)}
+  drawPip();await pipV.play();await pipV.requestPictureInPicture()}catch(e){toast('Floating window blocked: '+(e&&e.name||'error')+(document.pictureInPictureEnabled===false?' (this page isn’t allowed to use it)':''))}}
+$('pill').onclick=openPip;$('pill').onkeydown=e=>{if(e.key==='Enter')openPip()};$('pipBtn').onclick=openPip;
+setMode('auto');
+$('bSave').onclick=()=>{
+ const r=S.run;if(!r)return toast('Nothing to save yet');
+ const end=r.pausedAt||Date.now(),w=elapsed(),id=Date.now();
+ S.shifts.push({id,start:r.start,end,worked:w,brk:(r.brkTotal||0)+(r.brkAt?end-r.brkAt:0),rate:rate(),pay:pay(w,rate(),weekHours()),note:S.notes||''});
+ S.run=null;S.notes='';$('notes').value='';save();render();toast('Shift saved')};
+$('clearAll').onclick=()=>{if(S.shifts.length&&confirm('Delete all saved shifts?')){S.shifts=[];save();render()}};
+$('rate').oninput=()=>{S.rate=$('rate').value;save();tick()};
+$('notes').oninput=()=>{S.notes=$('notes').value;save()};
+const open=()=>{$('modal').classList.add('on')};
+$('bMenu').onclick=open;$('mClose').onclick=()=>$('modal').classList.remove('on');
+
+async function share(){const d={title:'Shift Watch',text:'Track your hours and see what you earn.',url:location.href.split('#')[0]};
+ try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(d.url);toast('Link copied')}}catch(e){}}
+$('bShare').onclick=share;$('shareApp').onclick=share;
+$('addShift').onclick=()=>{
+ const a=new Date($('inD').value+'T'+$('inT').value),b=new Date($('outD').value+'T'+$('outT').value);
+ if(isNaN(a)||isNaN(b)||b<=a)return toast('Check your in and out times');
+ const brk=(parseFloat($('mBrk').value)||0)*60000,w=b-a-brk;if(w<=0)return toast('Break is longer than the shift');
+ S.shifts.push({id:Date.now(),start:a.getTime(),end:b.getTime(),worked:w,brk,rate:rate(),pay:pay(w,rate(),weekHours()),note:''});
+ save();render();$('modal').classList.remove('on');toast('Shift added')};
+function bind(id,key,num){const e=$(id);if(e.type==='checkbox')e.checked=S.opt[key];else e.value=S.opt[key];
+ e.onchange=()=>{S.opt[key]=e.type==='checkbox'?e.checked:(parseFloat(e.value)||0);save();tick();
+  if(id==='optNotify'&&e.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();
+  if(id==='optBadge'&&!e.checked&&navigator.clearAppBadge)navigator.clearAppBadge()}}
+bind('optBadge','badge');bind('optLive','live');bind('optNotify','notify');bind('optOT','ot');bind('otAfter','otAfter');bind('otMult','otMult');
+$('rate').value=S.rate;$('notes').value=S.notes||'';
+const now=new Date(),z=n=>String(n).padStart(2,'0'),ds=new Date(now-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+$('inD').value=ds;$('outD').value=ds;$('inT').value='08:00';$('outT').value=z(now.getHours())+':'+z(now.getMinutes());
+let lastNote=0,noteShown=false;
+function closeNote(){noteShown=false;if(!('serviceWorker' in navigator))return;navigator.serviceWorker.ready.then(g=>g.getNotifications({tag:'sw-live'}).then(l=>l.forEach(x=>x.close()))).catch(()=>{})}
+function liveNote(run,left){
+ if(!S.opt.live||!window.Notification||!('serviceWorker' in navigator)||Notification.permission!=='granted'||!run){if(noteShown)closeNote();return}
+ const n=Date.now();if(n-lastNote<5000)return;lastNote=n;
+ const lm=left/(rate()||1)*3600000;
+ const body=run.pausedAt?'Paused':run.brkAt?'On break':hms(lm)+' left · done at '+new Date(n+lm).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+ navigator.serviceWorker.ready.then(g=>{g.showNotification(money(left)+' to go',{body,tag:'sw-live',silent:true,requireInteraction:true,icon:'icon-192.png',badge:'icon-192.png'});noteShown=true}).catch(()=>{})}
+$('optLive').addEventListener('change',e=>{if(e.target.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();if(!e.target.checked)closeNote()});
+$('optBadge').addEventListener('change',e=>{if(!e.target.checked&&navigator.clearAppBadge)navigator.clearAppBadge()});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();setInterval(tick,1000);
+</script></body></html>
