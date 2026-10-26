@@ -118,6 +118,13 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div class="two"><div><div class="lab">After (hrs/wk)</div><input class="in" type="number" id="otAfter" value="40" style="font-size:22px;margin-top:10px"></div>
 <div><div class="lab">Rate multiplier</div><input class="in" type="number" step="0.1" id="otMult" value="1.5" style="font-size:22px;margin-top:10px"></div></div></div>
 </div>
+<div class="modal" id="editModal"><div class="mh"><h2>Edit shift</h2><button id="eClose" aria-label="Close">✕</button></div>
+<div class="sec"><div class="lab">Clocked in</div><input class="in" type="date" id="eInD" style="font-size:20px;margin-top:10px"><div class="tsel" id="eInT"></div>
+<div class="lab" style="margin-top:20px">Clocked out</div><input class="in" type="date" id="eOutD" style="font-size:20px;margin-top:10px"><div class="tsel" id="eOutT"></div>
+<div class="two" style="margin-top:20px"><div><div class="lab">Unpaid break (min)</div><input class="in" type="number" id="eBrk" style="font-size:20px;margin-top:10px"></div><div><div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="eRate" style="font-size:20px;margin-top:10px"></div></div>
+<div class="lab" style="margin-top:20px">Notes</div><textarea class="in" id="eNote" rows="3" style="font-size:18px;margin-top:10px"></textarea>
+<button class="go" id="eSave">Save changes</button><button class="go" id="eDel" style="background:var(--bg2);color:var(--red);border:1px solid var(--line)">Delete shift</button></div></div>
+<div class="modal" id="askM" style="background:rgba(0,0,0,.65);z-index:40"><div style="max-width:340px;margin:30vh 22px 0;padding:24px;background:var(--bg);border:1px solid var(--line);border-radius:18px;margin-left:auto;margin-right:auto"><p id="askT" style="margin:0 0 18px;font-size:19px;color:#fff"></p><div class="grid"><button class="b rst" id="askN">Cancel</button><button class="b" id="askY" style="background:var(--red)">Yes</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -172,8 +179,8 @@ function render(){
   if(s.note){const n=document.createElement('p');n.textContent=s.note;n.style.marginTop='6px';n.style.fontStyle='italic';l.append(n)}
   const a=document.createElement('div');a.className='amt';a.textContent=money(s.pay);
   const x=document.createElement('button');x.className='del';x.textContent='🗑';x.setAttribute('aria-label','Delete shift');
-  x.onclick=()=>{if(confirm('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==s.id);save();render()}};
-  el.append(l,a,x);$('list').append(el)});
+  x.onclick=async()=>{if(await ask('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==s.id);save();render()}};
+  const ed=document.createElement('button');ed.className='del';ed.textContent='✎';ed.setAttribute('aria-label','Edit shift');ed.onclick=()=>openEdit(s);el.append(l,a,ed,x);$('list').append(el)});
  if(!S.shifts.length){$('list').innerHTML='<p>No saved shifts yet. Start the timer to log your first one.</p>'}
  tick();
 }
@@ -186,7 +193,7 @@ $('bBreak').onclick=()=>{const r=S.run;if(!r)return toast('Start the timer first
  if(r.pausedAt)return toast('Resume the timer first');
  if(r.brkAt){r.brkTotal=(r.brkTotal||0)+(Date.now()-r.brkAt);r.brkAt=null}else r.brkAt=Date.now();
  save();tick()};
-$('bReset').onclick=()=>{if(S.run&&!confirm('Reset the current shift?'))return;S.run=null;save();tick()};
+$('bReset').onclick=async()=>{if(S.run&&!(await ask('Reset the current shift? The running time will be lost.')))return;S.run=null;save();tick()};
 S.sched=S.sched||{};
 const MODES={auto:{t:'Set a future clock-in and the timer starts counting on its own the moment that time arrives.',b:'Arm timer',h:'17:00'},brk:{t:'Set your break time ahead and the 30-minute break starts on its own when it arrives, even if the app is closed.',b:'Schedule break',h:'12:00'},miss:{t:'Set when you really clocked in and the running clock will catch up to now.',b:'Catch up clock',h:'08:00'}};
 let mode='auto';
@@ -227,7 +234,7 @@ $('bSave').onclick=()=>{
  const end=r.pausedAt||Date.now(),w=elapsed(),id=Date.now();
  S.shifts.push({id,start:r.start,end,worked:w,brk:(r.brkTotal||0)+(r.brkAt?end-r.brkAt:0),rate:rate(),pay:pay(w,rate(),weekHours()),note:S.notes||''});
  S.run=null;S.notes='';$('notes').value='';save();render();toast('Shift saved')};
-$('clearAll').onclick=()=>{if(S.shifts.length&&confirm('Delete all saved shifts?')){S.shifts=[];save();render()}};
+$('clearAll').onclick=async()=>{if(S.shifts.length&&await ask('Delete all saved shifts?')){S.shifts=[];save();render()}};
 $('rate').oninput=()=>{S.rate=$('rate').value;save();tick()};
 $('notes').oninput=()=>{S.notes=$('notes').value;save()};
 const open=()=>{$('modal').classList.add('on')};
@@ -261,5 +268,22 @@ function liveNote(run,left){
 $('optLive').addEventListener('change',e=>{if(e.target.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();if(!e.target.checked)closeNote()});
 $('optBadge').addEventListener('change',e=>{if(!e.target.checked&&navigator.clearAppBadge)navigator.clearAppBadge()});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+function fillT(el){el.innerHTML='<select class="in"></select><select class="in"></select><select class="in"><option>AM</option><option>PM</option></select>';const[h,m]=el.children;for(let i=1;i<=12;i++)h.add(new Option(i,i));for(let i=0;i<60;i++)m.add(new Option(String(i).padStart(2,'0'),i))}
+function setTv(el,ms){const d=new Date(ms),H=d.getHours(),[h,m,p]=el.children;p.value=H>=12?'PM':'AM';h.value=H%12||12;m.value=d.getMinutes()}
+function getTv(el){const[h,m,p]=el.children;let H=+h.value%12;if(p.value==='PM')H+=12;return String(H).padStart(2,'0')+':'+String(m.value).padStart(2,'0')}
+const dstr=ms=>{const d=new Date(ms);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function ask(t){return new Promise(r=>{$('askT').textContent=t;$('askM').classList.add('on');const d=v=>{$('askM').classList.remove('on');r(v)};$('askY').onclick=()=>d(true);$('askN').onclick=()=>d(false)})}
+let editId=null;fillT($('eInT'));fillT($('eOutT'));
+function openEdit(s){editId=s.id;$('eInD').value=dstr(s.start);setTv($('eInT'),s.start);$('eOutD').value=dstr(s.end);setTv($('eOutT'),s.end);$('eBrk').value=Math.round(s.brk/60000);$('eRate').value=s.rate;$('eNote').value=s.note||'';$('editModal').classList.add('on')}
+$('eClose').onclick=()=>$('editModal').classList.remove('on');
+$('eSave').onclick=()=>{const s=S.shifts.find(q=>q.id===editId);if(!s)return;
+ const a=new Date($('eInD').value+'T'+getTv($('eInT'))).getTime(),b=new Date($('eOutD').value+'T'+getTv($('eOutT'))).getTime();
+ if(isNaN(a)||isNaN(b)||b<=a)return toast('Check your in and out times');
+ const brk=(parseFloat($('eBrk').value)||0)*60000,w=b-a-brk,r=parseFloat($('eRate').value)||0;
+ if(w<=0)return toast('Break is longer than the shift');
+ const ws=weekStart(a),prior=S.shifts.filter(q=>q.id!==s.id&&q.start>=ws&&q.start<ws+6048e5&&q.start<a).reduce((t,q)=>t+q.worked/3600000,0);
+ Object.assign(s,{start:a,end:b,worked:w,brk,rate:r,pay:pay(w,r,prior),note:$('eNote').value.trim()});
+ save();render();$('editModal').classList.remove('on');toast('Shift updated')};
+$('eDel').onclick=async()=>{if(await ask('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==editId);save();render();$('editModal').classList.remove('on')}};
 render();setInterval(tick,1000);
 </script></body></html>
