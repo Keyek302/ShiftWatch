@@ -94,6 +94,7 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div id="list"></div>
 <p style="text-align:center;margin-top:40px">Overtime, missed punches, and shift notes now live in the menu above.</p>
 <p style="text-align:center;border-top:1px solid var(--line);padding-top:30px;margin-top:30px">Shift Watch — track your hours, see what you earn.</p>
+<p style="text-align:center;margin:-10px 0 0">More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a></p>
 </main>
 
 <div class="modal" id="modal">
@@ -107,7 +108,8 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div class="lab" style="margin-top:20px">Unpaid break (min)</div><input class="in" type="number" id="mBrk" value="0" style="font-size:20px;margin-top:10px">
 <button class="go" id="addShift">Add shift</button></div>
 <div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
-<div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
+<div class="sec"><h2>More apps</h2><p>Check out my other apps and games.</p><a class="go" href="https://keyek302.github.io" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Visit keyek302.github.io</a></div>
+<div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee. More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a>.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
 <div class="sec"><h2>Goal widget</h2><p>Keep your “to go” amount on the home-screen app icon while you work.</p>
 <div class="tog"><div><h3>Goal on app icon</h3><p>Shows whole dollars left to a 10-hour shift.</p></div><input type="checkbox" id="optBadge" checked></div>
 <div class="tog"><div><h3>Live notification</h3><p>Keeps “$ to go” and time left in your notification shade while a shift runs.</p></div><input type="checkbox" id="optLive"></div>
@@ -157,7 +159,7 @@ function tick(){
  $('bPause').textContent=!run?'Start':run.pausedAt?'Resume':'Pause';
  const onB=!!(run&&run.brkAt);$('bBreak').classList.toggle('act',onB);$('bBreak').textContent=onB?'On break '+hms(BREAK-(Date.now()-run.brkAt)).slice(3)+' · tap to end':'Break · 30 min';
  drawPip();
- liveNote(run,left);
+ liveNote(run,left,earned);
  if(S.opt.badge&&navigator.setAppBadge){try{run?navigator.setAppBadge(Math.ceil(left)):navigator.clearAppBadge()}catch(x){}}
  if(run&&S.opt.notify&&left<=0&&!run.notified&&goal>0){run.notified=true;save();toast('Goal reached!');try{if(Notification.permission==='granted')new Notification('Shift Watch',{body:'You hit '+money(goal)+'.'})}catch(x){}}
 }
@@ -216,12 +218,12 @@ function runSched(){const s=S.sched,n=Date.now();
  const f=ms=>new Date(ms).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'});
  const h=['auto','brk'].filter(k=>s[k]).map(k=>'<div>'+(k==='auto'?'Auto-start':'Break')+' set for '+f(s[k])+' <button data-c="'+k+'">Cancel</button></div>').join('');
  if($('armed').dataset.h!==h){$('armed').dataset.h=h;$('armed').innerHTML=h}}
-let pipV=null;const pc=document.createElement('canvas');pc.width=480;pc.height=270;
+let pipV=null;const pc=document.createElement('canvas');pc.width=480;pc.height=300;
 function drawPip(){if(!pipV)return;const c=pc.getContext('2d'),w=pc.width;
- c.fillStyle='#0a0a14';c.fillRect(0,0,w,pc.height);c.textAlign='center';
- c.fillStyle='#09ff1a';c.font='700 96px Roboto,system-ui,sans-serif';c.fillText($('toGo').textContent,w/2,125);
- c.fillStyle='#9a9ab0';c.font='500 26px Roboto,system-ui,sans-serif';c.fillText('TO GO',w/2,165);
- c.fillStyle='#1c8f3f';c.font='300 64px Roboto,system-ui,sans-serif';c.fillText($('toGoT').textContent,w/2,240)}
+ c.fillStyle='#0a0a14';c.fillRect(0,0,w,pc.height);c.textAlign='center';c.fillStyle='#fff';c.font='500 40px Roboto,system-ui,sans-serif';c.fillText($('earn').textContent+' earned',w/2,58);
+ c.fillStyle='#09ff1a';c.font='700 84px Roboto,system-ui,sans-serif';c.fillText($('toGo').textContent,w/2,165);
+ c.fillStyle='#9a9ab0';c.font='500 26px Roboto,system-ui,sans-serif';c.fillText('TO GO',w/2,200);
+ c.fillStyle='#1c8f3f';c.font='300 64px Roboto,system-ui,sans-serif';c.fillText($('toGoT').textContent,w/2,268)}
 async function openPip(){
  if(!pc.captureStream||!('requestPictureInPicture' in HTMLVideoElement.prototype))return toast('This browser can’t show a floating window');
  try{if(document.pictureInPictureElement){await document.exitPictureInPicture();return}
@@ -259,12 +261,12 @@ const now=new Date(),z=n=>String(n).padStart(2,'0'),ds=new Date(now-now.getTimez
 $('inD').value=ds;$('outD').value=ds;$('inT').value='08:00';$('outT').value=z(now.getHours())+':'+z(now.getMinutes());
 let lastNote=0,noteShown=false;
 function closeNote(){noteShown=false;if(!('serviceWorker' in navigator))return;navigator.serviceWorker.ready.then(g=>g.getNotifications({tag:'sw-live'}).then(l=>l.forEach(x=>x.close()))).catch(()=>{})}
-function liveNote(run,left){
+function liveNote(run,left,earned){
  if(!S.opt.live||!window.Notification||!('serviceWorker' in navigator)||Notification.permission!=='granted'||!run){if(noteShown)closeNote();return}
  const n=Date.now();if(n-lastNote<5000)return;lastNote=n;
  const lm=left/(rate()||1)*3600000;
  const body=run.pausedAt?'Paused':run.brkAt?'On break':hms(lm)+' left · done at '+new Date(n+lm).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
- navigator.serviceWorker.ready.then(g=>{g.showNotification(money(left)+' to go',{body,tag:'sw-live',silent:true,requireInteraction:true,icon:'icon-192.png',badge:'icon-192.png'});noteShown=true}).catch(()=>{})}
+ navigator.serviceWorker.ready.then(g=>{g.showNotification(money(left)+' to go · '+money(earned)+' earned',{body,tag:'sw-live',silent:true,requireInteraction:true,icon:'icon-192.png',badge:'icon-192.png'});noteShown=true}).catch(()=>{})}
 $('optLive').addEventListener('change',e=>{if(e.target.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();if(!e.target.checked)closeNote()});
 $('optBadge').addEventListener('change',e=>{if(!e.target.checked&&navigator.clearAppBadge)navigator.clearAppBadge()});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
