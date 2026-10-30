@@ -86,7 +86,7 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div><div class="lab">Week shifts</div><b id="wkN">0</b></div>
 <div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div>
 
-<div class="stack"><div class="lab">Paycheck stack</div>
+<div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
 <svg width="150" height="110" viewBox="0 0 150 110" style="margin-top:14px" aria-hidden="true"><g fill="#22c55e" stroke="#15803d" stroke-width="3"><rect x="14" y="62" width="122" height="32" rx="5"/><rect x="14" y="50" width="122" height="32" rx="5"/><rect x="14" y="38" width="122" height="32" rx="5"/><rect x="14" y="26" width="122" height="32" rx="5"/></g><ellipse cx="75" cy="42" rx="18" ry="11" fill="#16a34a"/></svg>
 <b id="stackAmt">$0.00</b></div>
 
@@ -107,6 +107,11 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div class="lab" style="margin-top:20px">Clocked out</div><input class="in" type="date" id="outD" style="font-size:20px;margin-top:10px"><input class="in" type="time" id="outT" style="font-size:20px">
 <div class="lab" style="margin-top:20px">Unpaid break (min)</div><input class="in" type="number" id="mBrk" value="0" style="font-size:20px;margin-top:10px">
 <button class="go" id="addShift">Add shift</button></div>
+<div class="sec"><h2>Add vacation / PTO</h2><p>Paid time off adds to your pay but doesn’t count toward overtime hours.</p>
+<div class="lab">Type</div><select class="in" id="pKind" style="font-size:20px;margin-top:10px"><option>PTO</option><option>Vacation</option></select>
+<div class="lab" style="margin-top:20px">Date</div><input class="in" type="date" id="pD" style="font-size:20px;margin-top:10px">
+<div class="two" style="margin-top:20px"><div><div class="lab">Hours</div><input class="in" type="number" step="0.25" id="pH" value="8" style="font-size:20px;margin-top:10px"></div><div><div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="pR" style="font-size:20px;margin-top:10px"></div></div>
+<button class="go" id="addPto">Add PTO</button></div>
 <div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
 <div class="sec"><h2>More apps</h2><p>Check out my other apps and games.</p><a class="go" href="https://keyek302.github.io" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Visit keyek302.github.io</a></div>
 <div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee. More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a>.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
@@ -144,13 +149,14 @@ function weekStart(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDat
 function elapsed(){const r=S.run;if(!r)return 0;
  if(r.brkAt&&Date.now()-r.brkAt>=BREAK){r.brkTotal=(r.brkTotal||0)+BREAK;r.brkAt=null;save();toast('Break over. Pay is running again')}
  const now=r.pausedAt||r.brkAt||Date.now();return now-r.start-r.paused-(r.brkTotal||0)}
-function weekHours(excludeId){const ws=weekStart(Date.now());return S.shifts.filter(s=>s.start>=ws&&s.id!==excludeId).reduce((a,s)=>a+s.worked/3600000,0)}
+function weekHours(excludeId){const ws=weekStart(Date.now());return S.shifts.filter(s=>s.start>=ws&&s.id!==excludeId&&!s.pto).reduce((a,s)=>a+s.worked/3600000,0)}
 function pay(ms,r,priorHrs){const h=ms/3600000;if(!S.opt.ot)return h*r;const lim=S.opt.otAfter,m=S.opt.otMult;const reg=Math.max(0,Math.min(h,lim-priorHrs));return reg*r+(h-reg)*r*m}
 function tick(){
  runSched();
  const e=elapsed(),r=rate(),run=S.run;
  const earned=Math.max(0,pay(e,r,weekHours()));
- $('clock').textContent=hms(e);$('earn').textContent=money(earned);$('stackAmt').textContent=money(earned);
+ $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+ $('stackAmt').textContent=money(S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
  const goal=r*GOAL_H,left=Math.max(0,goal-earned);
  $('toGo').textContent=money(left);$('toGoT').textContent=hms(left/(r||1)*3600000);
  $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr';
@@ -168,7 +174,7 @@ function render(){
  const sum=a=>a.reduce((t,s)=>t+s.pay,0),hrs=a=>a.reduce((t,s)=>t+s.worked,0)/3600000;
  $('wkAmt').textContent=money(sum(wk));$('wkHrs').textContent=hrs(wk).toFixed(1)+' hrs';
  $('allAmt').textContent=money(sum(S.shifts));$('allHrs').textContent=hrs(S.shifts).toFixed(1)+' hrs';
- $('wkN').textContent=wk.length;$('avg').textContent=money(S.shifts.length?sum(S.shifts)/S.shifts.length:0);
+ const wr=S.shifts.filter(s=>!s.pto);$('wkN').textContent=wk.filter(s=>!s.pto).length;$('avg').textContent=money(wr.length?sum(wr)/wr.length:0);
  const t=ms=>new Date(ms).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  const d=ms=>new Date(ms).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
  $('list').innerHTML='';
@@ -176,7 +182,7 @@ function render(){
   const el=document.createElement('div');el.className='shift';
   const l=document.createElement('div');
   const h=document.createElement('h3');h.textContent=d(s.start);
-  const p=document.createElement('p');p.textContent=t(s.start)+' – '+t(s.end)+' · '+hms(s.worked)+' worked · '+hms(s.brk)+' break · '+money(s.rate)+'/hr';
+  const p=document.createElement('p');p.textContent=s.pto?(s.kind||'PTO')+' · '+(s.worked/3600000).toFixed(2)+' hrs · '+money(s.rate)+'/hr · not counted toward overtime':t(s.start)+' – '+t(s.end)+' · '+hms(s.worked)+' worked · '+hms(s.brk)+' break · '+money(s.rate)+'/hr';
   l.append(h,p);
   if(s.note){const n=document.createElement('p');n.textContent=s.note;n.style.marginTop='6px';n.style.fontStyle='italic';l.append(n)}
   const a=document.createElement('div');a.className='amt';a.textContent=money(s.pay);
@@ -283,9 +289,14 @@ $('eSave').onclick=()=>{const s=S.shifts.find(q=>q.id===editId);if(!s)return;
  if(isNaN(a)||isNaN(b)||b<=a)return toast('Check your in and out times');
  const brk=(parseFloat($('eBrk').value)||0)*60000,w=b-a-brk,r=parseFloat($('eRate').value)||0;
  if(w<=0)return toast('Break is longer than the shift');
- const ws=weekStart(a),prior=S.shifts.filter(q=>q.id!==s.id&&q.start>=ws&&q.start<ws+6048e5&&q.start<a).reduce((t,q)=>t+q.worked/3600000,0);
- Object.assign(s,{start:a,end:b,worked:w,brk,rate:r,pay:pay(w,r,prior),note:$('eNote').value.trim()});
+ const ws=weekStart(a),prior=S.shifts.filter(q=>q.id!==s.id&&q.start>=ws&&q.start<ws+6048e5&&q.start<a&&!q.pto).reduce((t,q)=>t+q.worked/3600000,0);
+ Object.assign(s,{start:a,end:b,worked:w,brk,rate:r,pay:s.pto?w/3600000*r:pay(w,r,prior),note:$('eNote').value.trim()});
  save();render();$('editModal').classList.remove('on');toast('Shift updated')};
 $('eDel').onclick=async()=>{if(await ask('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==editId);save();render();$('editModal').classList.remove('on')}};
+$('pD').value=lday(0);$('pR').value=rate()||'';
+$('addPto').onclick=()=>{const h=parseFloat($('pH').value),r=parseFloat($('pR').value)||rate(),a=new Date($('pD').value+'T08:00').getTime();
+ if(isNaN(a)||!(h>0))return toast('Enter a date and hours');
+ S.shifts.push({id:Date.now(),start:a,end:a+h*3600000,worked:h*3600000,brk:0,rate:r,pay:h*r,note:'',pto:true,kind:$('pKind').value});
+ save();render();$('modal').classList.remove('on');toast($('pKind').value+' added')};
 render();setInterval(tick,1000);
 </script></body></html>
