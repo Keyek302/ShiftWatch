@@ -57,7 +57,7 @@ details .in{font-size:18px;margin-top:12px}
 .mini{display:flex;gap:8px;margin:10px 0}.mini button{background:var(--bg2);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:10px 16px;font-weight:500}
 small.n{display:block;font-size:15px;margin:12px 0}
 .tsel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.tsel .in{margin-top:12px;font-size:20px;padding:14px 8px}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--bg);border-radius:16px;padding:10px;margin-top:14px}.tabs button{background:none;color:var(--tx);border-radius:12px;padding:16px 4px;font-weight:700;font-size:17px;line-height:1.2}.tabs button.on{background:var(--gb);color:#fff}#armed div{margin-top:14px;font-size:16px;color:var(--tx)}#armed button{background:var(--bg);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:6px 12px;margin-left:8px}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--bg);border-radius:16px;padding:10px;margin-top:14px}.tabs button{background:none;color:var(--tx);border-radius:12px;padding:16px 4px;font-weight:700;font-size:17px;line-height:1.2}.tabs button.on{background:var(--gb);color:#fff}#armed div{margin-top:14px;font-size:16px;color:var(--tx)}#armed button{background:var(--bg);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:6px 12px;margin-left:8px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -69,7 +69,7 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div class="lab" style="color:var(--g)">Hourly rate</div>
 <div style="margin-top:12px;position:relative"><input class="in" id="rate" inputmode="decimal" value="25.10" aria-label="Hourly rate" style="padding-left:50px"><span style="position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:26px">$</span></div>
 <details id="sched"><summary>Schedule a punch / missed start</summary>
-<div class="tabs" id="tabs"><button data-m="auto" class="on">Auto-start</button><button data-m="brk">Break</button><button data-m="miss">Missed start</button></div>
+<div class="tabs" id="tabs"><button data-m="auto" class="on">Auto-start</button><button data-m="brk">Break</button><button data-m="end">End shift</button><button data-m="miss">Missed start</button></div>
 <p id="schedTxt" style="margin:16px 0 0;font-size:17px;color:var(--tx)"></p>
 <input class="in" type="date" id="sD"><div class="tsel"><select class="in" id="sH" aria-label="Hour"></select><select class="in" id="sM" aria-label="Minute"></select><select class="in" id="sP" aria-label="AM or PM"><option>AM</option><option>PM</option></select></div>
 <div class="mini"><button id="sToday">Today</button><button id="sYest">Yesterday</button></div>
@@ -87,7 +87,7 @@ small.n{display:block;font-size:15px;margin:12px 0}
 <div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div>
 
 <div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
-<svg width="150" height="110" viewBox="0 0 150 110" style="margin-top:14px" aria-hidden="true"><g fill="#22c55e" stroke="#15803d" stroke-width="3"><rect x="14" y="62" width="122" height="32" rx="5"/><rect x="14" y="50" width="122" height="32" rx="5"/><rect x="14" y="38" width="122" height="32" rx="5"/><rect x="14" y="26" width="122" height="32" rx="5"/></g><ellipse cx="75" cy="42" rx="18" ry="11" fill="#16a34a"/></svg>
+<div id="stackImg" style="margin-top:14px;display:flex;justify-content:center;min-height:60px"></div>
 <b id="stackAmt">$0.00</b></div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
@@ -156,7 +156,7 @@ function tick(){
  const e=elapsed(),r=rate(),run=S.run;
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
- $('stackAmt').textContent=money(S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
+ const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
  const goal=r*GOAL_H,left=Math.max(0,goal-earned);
  $('toGo').textContent=money(left);$('toGoT').textContent=hms(left/(r||1)*3600000);
  $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr';
@@ -203,7 +203,7 @@ $('bBreak').onclick=()=>{const r=S.run;if(!r)return toast('Start the timer first
  save();tick()};
 $('bReset').onclick=async()=>{if(S.run&&!(await ask('Reset the current shift? The running time will be lost.')))return;S.run=null;save();tick()};
 S.sched=S.sched||{};
-const MODES={auto:{t:'Set a future clock-in and the timer starts counting on its own the moment that time arrives.',b:'Arm timer',h:'17:00'},brk:{t:'Set your break time ahead and the 30-minute break starts on its own when it arrives, even if the app is closed.',b:'Schedule break',h:'12:00'},miss:{t:'Set when you really clocked in and the running clock will catch up to now.',b:'Catch up clock',h:'08:00'}};
+const MODES={auto:{t:'Set a future clock-in and the timer starts counting on its own the moment that time arrives.',b:'Arm timer',h:'17:00'},brk:{t:'Set your break time ahead and the 30-minute break starts on its own when it arrives, even if the app is closed.',b:'Schedule break',h:'12:00'},end:{t:'Set when your shift ends and the timer stops and saves the shift on its own at that time, even if the app is closed.',b:'Schedule end',h:'17:00'},miss:{t:'Set when you really clocked in and the running clock will catch up to now.',b:'Catch up clock',h:'08:00'}};
 let mode='auto';
 const lday=o=>{const d=new Date();d.setDate(d.getDate()-o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const sH=$('sH'),sM=$('sM'),sP=$('sP');for(let i=1;i<=12;i++)sH.add(new Option(i,i));for(let i=0;i<60;i++)sM.add(new Option(String(i).padStart(2,'0'),i));
@@ -216,13 +216,24 @@ $('startBtn').onclick=()=>{
  const ms=new Date($('sD').value+'T'+getT()).getTime();if(isNaN(ms))return toast('Pick a date and time');
  if(mode==='miss'){if(ms>Date.now())return toast('That time is in the future');if(S.run)S.run.start=ms;else startRun(ms);save();tick();toast('Clock caught up');return}
  if(ms<=Date.now())return toast('Pick a time in the future');
- S.sched[mode]=ms;save();tick();toast(mode==='auto'?'Timer armed':'Break scheduled')};
+ S.sched[mode]=ms;save();tick();toast(mode==='auto'?'Timer armed':mode==='end'?'End of shift scheduled':'Break scheduled')};
 $('armed').onclick=e=>{const k=e.target.dataset&&e.target.dataset.c;if(k){delete S.sched[k];save();tick()}};
+let stackN=0;
+function drawStack(total){const goal=(rate()||1)*(S.opt.otAfter||40),f=Math.min(1.25,total/goal),n=Math.min(9,1+Math.floor(f*7)),w=Math.round(50+f*152),el=$('stackImg');
+ if(stackN!==n||!el.firstChild){stackN=n;let g='';for(let i=0;i<n;i++)g+='<rect x="14" y="'+(110-i*10)+'" width="122" height="32" rx="5"/>';
+  el.innerHTML='<svg viewBox="0 0 150 150" style="display:block;max-width:100%" aria-hidden="true"><g fill="#22c55e" stroke="#15803d" stroke-width="3">'+g+'</g><ellipse cx="75" cy="'+(126-(n-1)*10)+'" rx="18" ry="11" fill="#16a34a"/></svg>'}
+ el.firstChild.style.width=w+'px'}
+function finishRun(at){const r=S.run;if(!r)return;
+ if(at<=r.start){S.run=null;save();return}
+ const brk=(r.brkTotal||0)+(r.brkAt?Math.max(0,Math.min(BREAK,at-r.brkAt)):0),pz=r.paused+(r.pausedAt?Math.max(0,at-r.pausedAt):0),w=Math.max(0,at-r.start-pz-brk);
+ S.shifts.push({id:Date.now(),start:r.start,end:at,worked:w,brk,rate:rate(),pay:pay(w,rate(),weekHours()),note:S.notes||''});
+ S.run=null;S.notes='';$('notes').value='';save();render();toast('Shift ended and saved')}
 function runSched(){const s=S.sched,n=Date.now();
  if(s.auto&&n>=s.auto){const at=s.auto;delete s.auto;save();if(!S.run){startRun(at);toast('Timer started')}}
  if(s.brk&&n>=s.brk){const at=s.brk,r=S.run;delete s.brk;if(r&&!r.pausedAt&&!r.brkAt&&at>=r.start)r.brkAt=at;save()}
+ if(s.end&&n>=s.end){const at=s.end;delete s.end;save();finishRun(at)}
  const f=ms=>new Date(ms).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'});
- const h=['auto','brk'].filter(k=>s[k]).map(k=>'<div>'+(k==='auto'?'Auto-start':'Break')+' set for '+f(s[k])+' <button data-c="'+k+'">Cancel</button></div>').join('');
+ const h=['auto','brk','end'].filter(k=>s[k]).map(k=>'<div>'+(k==='auto'?'Auto-start':k==='brk'?'Break':'End of shift')+' set for '+f(s[k])+' <button data-c="'+k+'">Cancel</button></div>').join('');
  if($('armed').dataset.h!==h){$('armed').dataset.h=h;$('armed').innerHTML=h}}
 let pipV=null;const pc=document.createElement('canvas');pc.width=480;pc.height=300;
 function drawPip(){if(!pipV)return;const c=pc.getContext('2d'),w=pc.width;
