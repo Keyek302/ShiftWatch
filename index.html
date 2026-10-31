@@ -161,9 +161,9 @@ function tick(){
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
  const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
- const goal=r*GOAL_H,left=Math.max(0,goal-earned);
- $('toGo').textContent=money(left);$('toGoT').textContent=hms(left/(r||1)*3600000);
- $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr';
+ const goal=pay(GOAL_H*3600000,r,weekHours()),left=Math.max(0,goal-earned);
+ $('toGo').textContent=money(left);$('toGoT').textContent=hms(GOAL_H*3600000-e);
+ $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr'+(goal>r*GOAL_H+.005?' with overtime':'');
  const pct=goal?Math.min(100,Math.round(earned/goal*100)):0;
  $('goalEarned').textContent=money(earned)+' earned';$('goalPct').textContent=pct+'%';$('goalBar').style.width=pct+'%';
  $('bPause').textContent=!run?'Start':run.pausedAt?'Resume':'Pause';
@@ -289,7 +289,7 @@ function closeNote(){noteShown=false;if(!('serviceWorker' in navigator))return;n
 function liveNote(run,left,earned){
  if(!S.opt.live||!window.Notification||!('serviceWorker' in navigator)||Notification.permission!=='granted'||!run){if(noteShown)closeNote();return}
  const n=Date.now();if(n-lastNote<5000)return;lastNote=n;
- const lm=left/(rate()||1)*3600000;
+ const lm=Math.max(0,GOAL_H*3600000-elapsed());
  const body=run.pausedAt?'Paused':run.brkAt?'On break':hms(lm)+' left · done at '+new Date(n+lm).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  navigator.serviceWorker.ready.then(g=>{g.showNotification(money(left)+' to go · '+money(earned)+' earned',{body,tag:'sw-live',silent:true,requireInteraction:true,icon:'icon-192.png',badge:'icon-192.png'});noteShown=true}).catch(()=>{})}
 $('optLive').addEventListener('change',e=>{if(e.target.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();if(!e.target.checked)closeNote()});
