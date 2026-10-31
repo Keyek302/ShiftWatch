@@ -99,6 +99,10 @@ small.n{display:block;font-size:15px;margin:12px 0}
 
 <div class="modal" id="modal">
 <div class="mh"><h2>Options</h2><button id="mClose" aria-label="Close">✕</button></div>
+<div class="sec"><h2>Overtime tracker</h2>
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><b id="otWorked" style="color:var(--g);font-size:32px">0h 00m worked</b><span id="otLeft" style="font-size:18px;color:var(--gb)"></span></div>
+<div class="bar"><i id="otBar"></i></div>
+<small class="n" id="otNote"></small></div>
 <div class="sec"><h2>Shift notes</h2><p>Jot down what you worked on — it attaches when you save the shift.</p>
 <textarea class="in" id="notes" rows="4" style="font-size:18px" placeholder="e.g. Covered the front counter, trained the new hire…"></textarea>
 <small class="n">Saved automatically and cleared once the shift is saved.</small></div>
@@ -156,7 +160,7 @@ function tick(){
  const e=elapsed(),r=rate(),run=S.run;
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
- const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
+ const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
  const goal=r*GOAL_H,left=Math.max(0,goal-earned);
  $('toGo').textContent=money(left);$('toGoT').textContent=hms(left/(r||1)*3600000);
  $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr';
@@ -218,6 +222,10 @@ $('startBtn').onclick=()=>{
  if(ms<=Date.now())return toast('Pick a time in the future');
  S.sched[mode]=ms;save();tick();toast(mode==='auto'?'Timer armed':mode==='end'?'End of shift scheduled':'Break scheduled')};
 $('armed').onclick=e=>{const k=e.target.dataset&&e.target.dataset.c;if(k){delete S.sched[k];save();tick()}};
+function otStat(e){const lim=S.opt.otAfter||40,ws=weekStart(Date.now()),wk=weekHours()+e/3600000,hm=h=>{const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'},pto=S.shifts.filter(s=>s.pto&&s.start>=ws).reduce((t,s)=>t+s.worked/3600000,0);
+ $('otWorked').textContent=hm(wk)+' worked';$('otLeft').textContent=wk>=lim?'Overtime +'+hm(wk-lim):hm(lim-wk)+' to overtime';
+ $('otBar').style.width=Math.min(100,wk/lim*100)+'%';
+ $('otNote').textContent='Hours actually worked this week (Sun–Sat) out of '+lim+'.'+(pto>0?' PTO this week: '+hm(pto)+', not counted.':'')+(S.opt.ot?'':' Overtime pay is turned off below.')}
 let stackN=0;
 function drawStack(total){const goal=(rate()||1)*(S.opt.otAfter||40),f=Math.min(1.25,total/goal),n=Math.min(9,1+Math.floor(f*7)),w=Math.round(50+f*152),el=$('stackImg');
  if(stackN!==n||!el.firstChild){stackN=n;let g='';for(let i=0;i<n;i++)g+='<rect x="14" y="'+(110-i*10)+'" width="122" height="32" rx="5"/>';
