@@ -59,6 +59,18 @@ small.n{display:block;font-size:15px;margin:12px 0}
 .tsel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.tsel .in{margin-top:12px;font-size:20px;padding:14px 8px}
 .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--bg);border-radius:16px;padding:10px;margin-top:14px}.tabs button{background:none;color:var(--tx);border-radius:12px;padding:16px 4px;font-weight:700;font-size:17px;line-height:1.2}.tabs button.on{background:var(--gb);color:#fff}#armed div{margin-top:14px;font-size:16px;color:var(--tx)}#armed button{background:var(--bg);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:6px 12px;margin-left:8px}
 details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{color:var(--g);font-size:21px;font-weight:700}details.wk summary small{display:block;color:var(--tx);font-size:15px;font-weight:400;margin-top:4px}details.wk .shift{margin:12px 0 0}
+.stack{overflow:hidden}
+#stackImg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;margin-top:16px;padding:6px 4px}
+.bill{position:relative;height:46px;border-radius:6px;overflow:hidden;background:#0f1713;border:1px solid #2a3b30;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.bf{position:absolute;inset:0;display:flex}.bf em{display:block;height:100%;margin:0}
+.sg{background:linear-gradient(135deg,#2fbf4f,#1c8f3f)}.sb{background:linear-gradient(135deg,#4da3ff,#2a62c9)}
+.so{background:linear-gradient(110deg,#d98a00 30%,#ffe27a 50%,#d98a00 70%);background-size:200% 100%;animation:sh 2.5s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.bd{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
+.bd i{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%}
+.bd span{position:absolute;font-size:9px;font-weight:700;color:rgba(255,255,255,.8)}
+.bd span:first-child{left:5px;top:3px}.bd span:last-child{right:5px;bottom:3px}
+.bill.pop{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}@keyframes pop{from{transform:scale(.3) rotate(-20deg);opacity:0}}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -88,7 +100,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div>
 
 <div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
-<div id="stackImg" style="margin-top:14px;display:flex;justify-content:center;min-height:60px"></div>
+<div id="stackImg"></div><div id="stackLegend" style="margin-top:14px;font-size:15px"></div>
 <b id="stackAmt">$0.00</b></div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
@@ -161,7 +173,7 @@ function tick(){
  const e=elapsed(),r=rate(),run=S.run;
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
- const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
+ const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot,e,earned);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
  const goal=pay(GOAL_H*3600000,r,weekHours()),left=Math.max(0,goal-earned);
  $('toGo').textContent=money(left);$('toGoT').textContent=hms(GOAL_H*3600000-e);
  $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr'+(goal>r*GOAL_H+.005?' with overtime':'');
@@ -234,11 +246,19 @@ function otStat(e){const lim=S.opt.otAfter||40,ws=weekStart(Date.now()),wk=weekH
  $('otWorked').textContent=hm(wk)+' worked';$('otLeft').textContent=wk>=lim?'Overtime +'+hm(wk-lim):hm(lim-wk)+' to overtime';
  $('otBar').style.width=Math.min(100,wk/lim*100)+'%';
  $('otNote').textContent='Hours actually worked this week (Sun–Sat) out of '+lim+'.'+(pto>0?' PTO this week: '+hm(pto)+', not counted.':'')+(S.opt.ot?'':' Overtime pay is turned off below.')}
-let stackN=0;
-function drawStack(total){const goal=(rate()||1)*(S.opt.otAfter||40),f=Math.min(1.25,total/goal),n=Math.min(9,1+Math.floor(f*7)),w=Math.round(50+f*152),el=$('stackImg');
- if(stackN!==n||!el.firstChild){stackN=n;let g='';for(let i=0;i<n;i++)g+='<rect x="14" y="'+(110-i*10)+'" width="122" height="32" rx="5"/>';
-  el.innerHTML='<svg viewBox="0 0 150 150" style="display:block;max-width:100%" aria-hidden="true"><g fill="#22c55e" stroke="#15803d" stroke-width="3">'+g+'</g><ellipse cx="75" cy="'+(126-(n-1)*10)+'" rx="18" ry="11" fill="#16a34a"/></svg>'}
- el.firstChild.style.width=w+'px'}
+let prevN=0;
+function payParts(e,earned){const ws=weekStart(Date.now()),lim=S.opt.otAfter||40;let reg=0,pto=0,ot=0,prior=0;
+ S.shifts.filter(x=>x.start>=ws).sort((a,b)=>a.start-b.start).forEach(x=>{if(x.pto){pto+=x.pay;return}
+  const h=x.worked/3600000,rh=S.opt.ot?Math.max(0,Math.min(h,lim-prior)):h,rp=rh*x.rate;reg+=rp;ot+=Math.max(0,x.pay-rp);prior+=h});
+ const h=e/3600000,rh=S.opt.ot?Math.max(0,Math.min(h,lim-prior)):h,rp=rh*rate();reg+=rp;ot+=Math.max(0,earned-rp);return{reg,pto,ot}}
+function drawStack(total,e,earned){
+ const P=payParts(e,earned),U=100,list=[[P.reg,'sg','Regular','#2fbf4f'],[P.pto,'sb','PTO','#4da3ff'],[P.ot,'so','Overtime','#ffd447']].filter(x=>x[0]>0.004);
+ const nb=Math.min(30,Math.max(1,Math.ceil(total/U-1e-9))),full=Math.floor(total/U+1e-9),rot=[-1.2,.8,-.6,1.1];let h='';
+ for(let i=0;i<nb;i++){let pos=0,s='';
+  list.forEach(x=>{const ov=Math.min(pos+x[0],(i+1)*U)-Math.max(pos,i*U);if(ov>0)s+='<em class="'+x[1]+'" style="width:'+(ov/U*100).toFixed(1)+'%"></em>';pos+=x[0]});
+  h+='<div class="bill'+(prevN>0&&i>=prevN?' pop':'')+'" style="transform:rotate('+rot[i%4]+'deg)"><div class="bf">'+s+'</div><div class="bd"><span>100</span><i></i><span>100</span></div></div>'}
+ prevN=nb;if($('stackImg').dataset.h!==h){$('stackImg').dataset.h=h;$('stackImg').innerHTML=h}
+ $('stackLegend').innerHTML='<div style="font-size:17px;color:#fff;margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')}
 function finishRun(at){const r=S.run;if(!r)return;
  if(at<=r.start){S.run=null;save();return}
  const brk=(r.brkTotal||0)+(r.brkAt?Math.max(0,Math.min(BREAK,at-r.brkAt)):0),pz=r.paused+(r.pausedAt?Math.max(0,at-r.pausedAt):0),w=Math.max(0,at-r.start-pz-brk);
