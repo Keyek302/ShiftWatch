@@ -58,6 +58,7 @@ details .in{font-size:18px;margin-top:12px}
 small.n{display:block;font-size:15px;margin:12px 0}
 .tsel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.tsel .in{margin-top:12px;font-size:20px;padding:14px 8px}
 .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--bg);border-radius:16px;padding:10px;margin-top:14px}.tabs button{background:none;color:var(--tx);border-radius:12px;padding:16px 4px;font-weight:700;font-size:17px;line-height:1.2}.tabs button.on{background:var(--gb);color:#fff}#armed div{margin-top:14px;font-size:16px;color:var(--tx)}#armed button{background:var(--bg);border:1px solid var(--line);color:var(--g);border-radius:10px;padding:6px 12px;margin-left:8px}
+details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{color:var(--g);font-size:21px;font-weight:700}details.wk summary small{display:block;color:var(--tx);font-size:15px;font-weight:400;margin-top:4px}details.wk .shift{margin:12px 0 0}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -173,6 +174,7 @@ function tick(){
  if(S.opt.badge&&navigator.setAppBadge){try{run?navigator.setAppBadge(Math.ceil(left)):navigator.clearAppBadge()}catch(x){}}
  if(run&&S.opt.notify&&left<=0&&!run.notified&&goal>0){run.notified=true;save();toast('Goal reached!');try{if(Notification.permission==='granted')new Notification('Shift Watch',{body:'You hit '+money(goal)+'.'})}catch(x){}}
 }
+const openWk={};
 function render(){
  const ws=weekStart(Date.now()),wk=S.shifts.filter(s=>s.start>=ws);
  const sum=a=>a.reduce((t,s)=>t+s.pay,0),hrs=a=>a.reduce((t,s)=>t+s.worked,0)/3600000;
@@ -181,7 +183,13 @@ function render(){
  const wr=S.shifts.filter(s=>!s.pto);$('wkN').textContent=wk.filter(s=>!s.pto).length;$('avg').textContent=money(wr.length?sum(wr)/wr.length:0);
  const t=ms=>new Date(ms).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  const d=ms=>new Date(ms).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
- $('list').innerHTML='';
+ $('list').innerHTML='';const grp={};
+ const fm=ms=>new Date(ms).toLocaleDateString('en-US',{month:'long',day:'numeric'});
+ const wkBody=ms=>{const w=weekStart(ms);if(!grp[w]){const we=new Date(w);we.setDate(we.getDate()+6);const inW=S.shifts.filter(q=>weekStart(q.start)===w);
+  const d=document.createElement('details');d.className='wk';d.open=openWk[w]!==undefined?openWk[w]:w===ws;d.ontoggle=()=>{openWk[w]=d.open};
+  const sm=document.createElement('summary'),sub=document.createElement('small');sm.textContent=fm(w)+' – '+fm(we.getTime());
+  sub.textContent=money(inW.reduce((t,q)=>t+q.pay,0))+' · '+(inW.reduce((t,q)=>t+q.worked,0)/3600000).toFixed(1)+' hrs';sm.append(sub);
+  const b=document.createElement('div');d.append(sm,b);$('list').append(d);grp[w]={b}}return grp[w].b};
  [...S.shifts].sort((a,b)=>b.start-a.start).forEach(s=>{
   const el=document.createElement('div');el.className='shift';
   const l=document.createElement('div');
@@ -192,7 +200,7 @@ function render(){
   const a=document.createElement('div');a.className='amt';a.textContent=money(s.pay);
   const x=document.createElement('button');x.className='del';x.textContent='🗑';x.setAttribute('aria-label','Delete shift');
   x.onclick=async()=>{if(await ask('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==s.id);save();render()}};
-  const ed=document.createElement('button');ed.className='del';ed.textContent='✎';ed.setAttribute('aria-label','Edit shift');ed.onclick=()=>openEdit(s);el.append(l,a,ed,x);$('list').append(el)});
+  const ed=document.createElement('button');ed.className='del';ed.textContent='✎';ed.setAttribute('aria-label','Edit shift');ed.onclick=()=>openEdit(s);el.append(l,a,ed,x);wkBody(s.start).append(el)});
  if(!S.shifts.length){$('list').innerHTML='<p>No saved shifts yet. Start the timer to log your first one.</p>'}
  tick();
 }
