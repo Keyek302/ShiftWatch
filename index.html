@@ -174,9 +174,9 @@ function tick(){
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
  const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot,e,earned);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
- const goal=pay(GOAL_H*3600000,r,weekHours()),left=Math.max(0,goal-earned);
- $('toGo').textContent=money(left);$('toGoT').textContent=hms(GOAL_H*3600000-e);
- $('goalLab').textContent=GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent='what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr'+(goal>r*GOAL_H+.005?' with overtime':'');
+ const sc=S.run&&S.sched&&S.sched.end>Date.now()?S.sched.end:0,tl=sc?new Date(sc).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'',gm=goalMs(),goal=pay(gm,r,weekHours()),left=Math.max(0,goal-earned);
+ $('toGo').textContent=money(left);$('toGoT').textContent=hms(gm-e);
+ $('goalLab').textContent=sc?'Goal until '+tl:GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent=(sc?'what you earn if you clock out at '+tl:'what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr')+(goal>r*gm/3600000+.005?' with overtime':'');
  const pct=goal?Math.min(100,Math.round(earned/goal*100)):0;
  $('goalEarned').textContent=money(earned)+' earned';$('goalPct').textContent=pct+'%';$('goalBar').style.width=pct+'%';
  $('bPause').textContent=!run?'Start':run.pausedAt?'Resume':'Pause';
@@ -259,6 +259,12 @@ function drawStack(total,e,earned){
   h+='<div class="bill'+(prevN>0&&i>=prevN?' pop':'')+'" style="transform:rotate('+rot[i%4]+'deg)"><div class="bf">'+s+'</div><div class="bd"><span>100</span><i></i><span>100</span></div></div>'}
  prevN=nb;if($('stackImg').dataset.h!==h){$('stackImg').dataset.h=h;$('stackImg').innerHTML=h}
  $('stackLegend').innerHTML='<div style="font-size:17px;color:#fff;margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')}
+function goalMs(){const r=S.run,en=S.sched&&S.sched.end,n=Date.now(),G=GOAL_H*3600000;
+ if(!r||!en||en<=n)return G;
+ let w;
+ if(r.brkAt)w=(r.brkAt-r.start-r.paused-(r.brkTotal||0))+Math.max(0,en-(r.brkAt+BREAK));
+ else{w=en-r.start-r.paused-(r.brkTotal||0)-(r.pausedAt?n-r.pausedAt:0);const sb=S.sched.brk;if(sb&&sb<en)w-=Math.min(BREAK,en-Math.max(sb,n))}
+ return Math.max(elapsed(),w)}
 function finishRun(at){const r=S.run;if(!r)return;
  if(at<=r.start){S.run=null;save();return}
  const brk=(r.brkTotal||0)+(r.brkAt?Math.max(0,Math.min(BREAK,at-r.brkAt)):0),pz=r.paused+(r.pausedAt?Math.max(0,at-r.pausedAt):0),w=Math.max(0,at-r.start-pz-brk);
@@ -317,7 +323,7 @@ function closeNote(){noteShown=false;if(!('serviceWorker' in navigator))return;n
 function liveNote(run,left,earned){
  if(!S.opt.live||!window.Notification||!('serviceWorker' in navigator)||Notification.permission!=='granted'||!run){if(noteShown)closeNote();return}
  const n=Date.now();if(n-lastNote<5000)return;lastNote=n;
- const lm=Math.max(0,GOAL_H*3600000-elapsed());
+ const lm=Math.max(0,goalMs()-elapsed());
  const body=run.pausedAt?'Paused':run.brkAt?'On break':hms(lm)+' left · done at '+new Date(n+lm).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  navigator.serviceWorker.ready.then(g=>{g.showNotification(money(left)+' to go · '+money(earned)+' earned',{body,tag:'sw-live',silent:true,requireInteraction:true,icon:'icon-192.png',badge:'icon-192.png'});noteShown=true}).catch(()=>{})}
 $('optLive').addEventListener('change',e=>{if(e.target.checked&&window.Notification&&Notification.permission==='default')Notification.requestPermission();if(!e.target.checked)closeNote()});
