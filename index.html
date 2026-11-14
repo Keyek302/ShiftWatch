@@ -4,23 +4,23 @@
 <title>Shift Watch</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#151520"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <style>
-:root{color-scheme:dark;--bg:#151520;--bg2:#0a0a14;--line:#26263a;--g:#1c8f3f;--gb:#09ff1a;--tx:#9a9ab0;--or:#ff9800;--red:#e5484d;
+:root{color-scheme:dark;--e1:#0ff51f;--e2:#2fae3a;--e3:#3d6e47;--pz:#2a6b35;--sv:#188a3d;--g1:#1f7a42;--g2:#37506c;--gl:#cfe6d6;--be:#2e6e38;--hi:#fff;--tg:#333;--bill:#0f1713;--billb:#2a3b30;--bdc:rgba(255,255,255,.8);--bdo:rgba(255,255,255,.45);--bg:#151520;--bg2:#0a0a14;--line:#26263a;--g:#1c8f3f;--gb:#09ff1a;--tx:#9a9ab0;--or:#ff9800;--red:#e5484d;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 Roboto,system-ui,sans-serif}
 main{max-width:520px;margin:0 auto;padding:28px 22px 60px}
 h1,h2{margin:0;color:var(--g);letter-spacing:-.02em}
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.top h1{font-size:34px}.ib{display:flex;gap:8px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.top h1{font-size:30px}.ib{display:flex;gap:6px}
 button{font:inherit;cursor:pointer;border:0}
-.sq{width:46px;height:46px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);color:var(--g);font-size:20px}
+.sq{width:40px;height:40px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);color:var(--g);font-size:20px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0}
 .row p{margin:0;font-size:17px}
 .pill{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:10px 16px;text-align:center;min-width:110px}
 .pill b{display:block;color:var(--gb);font-size:22px}.pill small{display:block;font-size:13px}
 #clock{font-size:clamp(52px,17vw,88px);color:var(--g);font-weight:300;font-variant-numeric:tabular-nums;margin:6px 0 0;white-space:nowrap}
 .lab{font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
-.earn{margin:22px 0;padding:34px 26px 38px;border-radius:26px;background:linear-gradient(135deg,#0ff51f,#2fae3a 45%,#3d6e47);color:#fff}
+.earn{margin:22px 0;padding:34px 26px 38px;border-radius:26px;background:linear-gradient(135deg,var(--e1),var(--e2) 45%,var(--e3));color:#fff}
 .earn b{display:block;font-size:52px;line-height:1.1}.earn span{font-size:19px}
 .in{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;color:var(--g);font:inherit;font-size:26px;padding:16px 18px}
 input,textarea{font-family:inherit}
@@ -29,11 +29,11 @@ details summary{font-size:20px;font-weight:500;cursor:pointer}
 details .in{font-size:18px;margin-top:12px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .b{padding:18px;border-radius:14px;font-weight:700;font-size:18px;color:#fff}
-.b.pause{background:#2a6b35}.b.brk{background:var(--or)}.b.rst{background:var(--bg2);color:var(--g);border:1px solid var(--line)}.b.sv{background:#188a3d}
+.b.pause{background:var(--pz)}.b.brk{background:var(--or)}.b.rst{background:var(--bg2);color:var(--g);border:1px solid var(--line)}.b.sv{background:var(--sv)}
 .b.act{outline:3px solid #fff}
-.goal{margin:30px -8px 0;padding:34px 24px;background:linear-gradient(135deg,#1f7a42,#37506c);display:flex;justify-content:space-between;gap:12px;color:#fff}
-.goal .lab{color:#cfe6d6}.goal b{display:block;font-size:44px;margin:8px 0}.goal p{margin:0;font-size:18px}
-.bar{height:14px;border-radius:9px;background:var(--bg2);margin:8px 0}.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--gb),#2e6e38);width:0}
+.goal{margin:30px -8px 0;padding:34px 24px;background:linear-gradient(135deg,var(--g1),var(--g2));display:flex;justify-content:space-between;gap:12px;color:#fff}
+.goal .lab{color:var(--gl)}.goal b{display:block;font-size:44px;margin:8px 0}.goal p{margin:0;font-size:18px}
+.bar{height:14px;border-radius:9px;background:var(--bg2);margin:8px 0}.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--gb),var(--be));width:0}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:34px 12px;margin:36px 0}
 .stats b{display:block;color:var(--g);font-size:38px}
 .stack{text-align:center;margin:30px 0}.stack b{display:block;color:var(--g);font-size:28px;margin-top:6px}
@@ -50,7 +50,7 @@ details .in{font-size:18px;margin-top:12px}
 .go{width:100%;padding:18px;border-radius:14px;background:var(--gb);color:#fff;font-weight:700;font-size:19px;margin-top:14px}
 .go.or{background:var(--or)}
 .tog{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0}.tog h3{margin:0;color:var(--g);font-size:20px}.tog p{margin:2px 0 0;font-size:16px}
-.tog input{appearance:none;width:62px;height:34px;border-radius:17px;background:#333;position:relative;flex:none}
+.tog input{appearance:none;width:62px;height:34px;border-radius:17px;background:var(--tg);position:relative;flex:none}
 .tog input::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;transition:.15s}
 .tog input:checked{background:var(--gb)}.tog input:checked::after{left:31px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -61,21 +61,24 @@ small.n{display:block;font-size:15px;margin:12px 0}
 details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{color:var(--g);font-size:21px;font-weight:700}details.wk summary small{display:block;color:var(--tx);font-size:15px;font-weight:400;margin-top:4px}details.wk .shift{margin:12px 0 0}
 .stack{overflow:hidden}
 #stackImg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;margin-top:16px;padding:6px 4px}
-.bill{position:relative;height:46px;border-radius:6px;overflow:hidden;background:#0f1713;border:1px solid #2a3b30;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.bill{position:relative;height:46px;border-radius:6px;overflow:hidden;background:var(--bill);border:1px solid var(--billb);box-shadow:0 3px 8px rgba(0,0,0,.5)}
 .bf{position:absolute;inset:0;display:flex}.bf em{display:block;height:100%;margin:0}
 .sg{background:linear-gradient(135deg,#2fbf4f,#1c8f3f)}.sb{background:linear-gradient(135deg,#4da3ff,#2a62c9)}
 .so{background:linear-gradient(110deg,#d98a00 30%,#ffe27a 50%,#d98a00 70%);background-size:200% 100%;animation:sh 2.5s linear infinite}
 @keyframes sh{to{background-position:-200% 0}}
 .bd{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
-.bd i{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%}
-.bd span{position:absolute;font-size:9px;font-weight:700;color:rgba(255,255,255,.8)}
+.bd i{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:1.5px solid var(--bdo);border-radius:50%}
+.bd span{position:absolute;font-size:9px;font-weight:700;color:var(--bdc)}
 .bd span:first-child{left:5px;top:3px}.bd span:last-child{right:5px;bottom:3px}
 .bill.pop{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}@keyframes pop{from{transform:scale(.3) rotate(-20deg);opacity:0}}
+#themeBar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:center;padding:16px 0 2px}#themeBar[hidden]{display:none}
+#themeBar button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}#themeBar button.on{border-color:var(--hi)}#themeBar button.mode{width:auto;border-radius:22px;padding:0 14px;background:var(--bg2);color:var(--g);font-weight:700;font-size:15px;border:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
 <main>
-<div class="top"><h1>Shift Timer</h1><div class="ib"><a class="sq" id="bCoffee" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" aria-label="Buy me a coffee" style="display:flex;align-items:center;justify-content:center;text-decoration:none">☕</a><button class="sq" id="bShare" aria-label="Share">⇪</button><button class="sq" id="bMenu" aria-label="Options">≡</button></div></div>
+<div class="top"><h1>Shift Timer</h1><div class="ib"><button class="sq" id="bTheme" aria-label="Color scheme">🎨</button><a class="sq" id="bCoffee" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" aria-label="Buy me a coffee" style="display:flex;align-items:center;justify-content:center;text-decoration:none">☕</a><button class="sq" id="bShare" aria-label="Share">⇪</button><button class="sq" id="bMenu" aria-label="Options">≡</button></div></div>
+<div id="themeBar" hidden></div>
 <div class="row"><p>Track a shift, take breaks, and save it to your week.</p><div class="pill" id="pill" role="button" tabindex="0" aria-label="Open floating countdown" style="cursor:pointer"><b id="toGo">$0.00</b><small>TO GO</small><small id="toGoT">00:00:00</small></div></div>
 <div id="clock">00:00:00</div><div class="lab" style="margin-top:12px">Elapsed time</div>
 <div class="earn"><b id="earn">$0.00</b><span>Earned so far</span></div>
@@ -148,7 +151,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div class="two" style="margin-top:20px"><div><div class="lab">Unpaid break (min)</div><input class="in" type="number" id="eBrk" style="font-size:20px;margin-top:10px"></div><div><div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="eRate" style="font-size:20px;margin-top:10px"></div></div>
 <div class="lab" style="margin-top:20px">Notes</div><textarea class="in" id="eNote" rows="3" style="font-size:18px;margin-top:10px"></textarea>
 <button class="go" id="eSave">Save changes</button><button class="go" id="eDel" style="background:var(--bg2);color:var(--red);border:1px solid var(--line)">Delete shift</button></div></div>
-<div class="modal" id="askM" style="background:rgba(0,0,0,.65);z-index:40"><div style="max-width:340px;margin:30vh 22px 0;padding:24px;background:var(--bg);border:1px solid var(--line);border-radius:18px;margin-left:auto;margin-right:auto"><p id="askT" style="margin:0 0 18px;font-size:19px;color:#fff"></p><div class="grid"><button class="b rst" id="askN">Cancel</button><button class="b" id="askY" style="background:var(--red)">Yes</button></div></div></div>
+<div class="modal" id="askM" style="background:rgba(0,0,0,.65);z-index:40"><div style="max-width:340px;margin:30vh 22px 0;padding:24px;background:var(--bg);border:1px solid var(--line);border-radius:18px;margin-left:auto;margin-right:auto"><p id="askT" style="margin:0 0 18px;font-size:19px;color:var(--hi)"></p><div class="grid"><button class="b rst" id="askN">Cancel</button><button class="b" id="askY" style="background:var(--red)">Yes</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -258,7 +261,7 @@ function drawStack(total,e,earned){
   list.forEach(x=>{const ov=Math.min(pos+x[0],(i+1)*U)-Math.max(pos,i*U);if(ov>0)s+='<em class="'+x[1]+'" style="width:'+(ov/U*100).toFixed(1)+'%"></em>';pos+=x[0]});
   h+='<div class="bill'+(prevN>0&&i>=prevN?' pop':'')+'" style="transform:rotate('+rot[i%4]+'deg)"><div class="bf">'+s+'</div><div class="bd"><span>100</span><i></i><span>100</span></div></div>'}
  prevN=nb;if($('stackImg').dataset.h!==h){$('stackImg').dataset.h=h;$('stackImg').innerHTML=h}
- $('stackLegend').innerHTML='<div style="font-size:17px;color:#fff;margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')}
+ $('stackLegend').innerHTML='<div style="font-size:17px;color:var(--hi);margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')}
 function goalMs(){const r=S.run,en=S.sched&&S.sched.end,n=Date.now(),G=GOAL_H*3600000;
  if(!r||!en||en<=n)return G;
  let w;
@@ -280,9 +283,9 @@ function runSched(){const s=S.sched,n=Date.now();
 let pipV=null;const pc=document.createElement('canvas');pc.width=480;pc.height=300;
 function drawPip(){if(!pipV)return;const c=pc.getContext('2d'),w=pc.width;
  c.fillStyle='#0a0a14';c.fillRect(0,0,w,pc.height);c.textAlign='center';c.fillStyle='#fff';c.font='500 40px Roboto,system-ui,sans-serif';c.fillText($('earn').textContent+' earned',w/2,58);
- c.fillStyle='#09ff1a';c.font='700 84px Roboto,system-ui,sans-serif';c.fillText($('toGo').textContent,w/2,165);
+ c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--gb').trim()||'#09ff1a';c.font='700 84px Roboto,system-ui,sans-serif';c.fillText($('toGo').textContent,w/2,165);
  c.fillStyle='#9a9ab0';c.font='500 26px Roboto,system-ui,sans-serif';c.fillText('TO GO',w/2,200);
- c.fillStyle='#1c8f3f';c.font='300 64px Roboto,system-ui,sans-serif';c.fillText($('toGoT').textContent,w/2,268)}
+ c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--g').trim()||'#1c8f3f';c.font='300 64px Roboto,system-ui,sans-serif';c.fillText($('toGoT').textContent,w/2,268)}
 async function openPip(){
  if(!pc.captureStream||!('requestPictureInPicture' in HTMLVideoElement.prototype))return toast('This browser can’t show a floating window');
  try{if(document.pictureInPictureElement){await document.exitPictureInPicture();return}
@@ -351,5 +354,24 @@ $('addPto').onclick=()=>{const h=parseFloat($('pH').value),r=parseFloat($('pR').
  if(isNaN(a)||!(h>0))return toast('Enter a date and hours');
  S.shifts.push({id:Date.now(),start:a,end:a+h*3600000,worked:h*3600000,brk:0,rate:r,pay:h*r,note:'',pto:true,kind:$('pKind').value});
  save();render();$('modal').classList.remove('on');toast($('pKind').value+' added')};
+const THEMES={green:{g:'#1c8f3f',gb:'#09ff1a',lg:'#17803a',lgb:'#14a02f',e1:'#0ff51f',e2:'#2fae3a',e3:'#3d6e47',pz:'#2a6b35',sv:'#188a3d',g1:'#1f7a42',g2:'#37506c',gl:'#cfe6d6',be:'#2e6e38'},
+blue:{g:'#2f7fd9',gb:'#3aa0ff',lg:'#1f6fc4',lgb:'#2285e6',e1:'#38a8ff',e2:'#2a6fd6',e3:'#2f4f8f',pz:'#274d85',sv:'#2269b8',g1:'#1f4f8a',g2:'#2f3f6e',gl:'#cfe0f6',be:'#2a4f86'},
+purple:{g:'#8a5fd6',gb:'#b06bff',lg:'#7442c8',lgb:'#8f4fe8',e1:'#b06bff',e2:'#7c3aed',e3:'#4c2a8f',pz:'#4a3485',sv:'#6d43c4',g1:'#5a2d9c',g2:'#2e3a6e',gl:'#e2d3f7',be:'#4a2f86'},
+orange:{g:'#d9822b',gb:'#ffa21a',lg:'#c46a10',lgb:'#e07b00',e1:'#ffb02e',e2:'#e8731c',e3:'#9a4a1c',pz:'#8a4f1f',sv:'#c9661a',g1:'#a85a1c',g2:'#6b3a2e',gl:'#f6dfc7',be:'#8a4a1c'},
+pink:{g:'#d94f9a',gb:'#ff4fa8',lg:'#c2307f',lgb:'#e0348a',e1:'#ff6bb8',e2:'#e0357f',e3:'#8f2a62',pz:'#8a2f63',sv:'#c43a86',g1:'#a8326f',g2:'#4a2f6e',gl:'#f7d3e6',be:'#8a2f62'}};
+const BASE={dark:{bg:'#151520',bg2:'#0a0a14',line:'#26263a',tx:'#9a9ab0',hi:'#fff',tg:'#333',bill:'#0f1713',billb:'#2a3b30',bdc:'rgba(255,255,255,.8)',bdo:'rgba(255,255,255,.45)'},
+light:{bg:'#f1f2f7',bg2:'#ffffff',line:'#d8dae6',tx:'#5b5f75',hi:'#14151f',tg:'#c3c7d6',bill:'#e3e8e4',billb:'#b9c4bc',bdc:'rgba(0,0,0,.4)',bdo:'rgba(0,0,0,.28)'}};
+function applyLook(){const th=THEMES[S.theme]||THEMES.green,md=S.mode==='light'?'light':'dark',st=document.documentElement.style,b=BASE[md];
+ for(const k in b)st.setProperty('--'+k,b[k]);
+ for(const k in th){if(k!=='lg'&&k!=='lgb')st.setProperty('--'+k,th[k])}
+ if(md==='light'){st.setProperty('--g',th.lg);st.setProperty('--gb',th.lgb)}
+ st.colorScheme=md;const m=document.querySelector('meta[name=theme-color]');if(m)m.content=b.bg;
+ document.querySelectorAll('#themeBar button[data-t]').forEach(x=>x.classList.toggle('on',x.dataset.t===S.theme));
+ const mb=$('modeBtn');if(mb)mb.textContent=md==='light'?'🌙 Dark':'☀️ Light'}
+function applyTheme(n){S.theme=n;save();applyLook()}
+const tb=$('themeBar');const mb=document.createElement('button');mb.id='modeBtn';mb.className='mode';mb.onclick=()=>{S.mode=S.mode==='light'?'dark':'light';save();applyLook()};tb.append(mb);
+Object.keys(THEMES).forEach(n=>{const b=document.createElement('button');b.dataset.t=n;b.setAttribute('aria-label',n+' theme');b.style.background='linear-gradient(135deg,'+THEMES[n].gb+','+THEMES[n].g+')';b.onclick=()=>{applyTheme(n);tb.hidden=true};tb.append(b)});
+$('bTheme').onclick=()=>{tb.hidden=!tb.hidden};
+applyLook();
 render();setInterval(tick,1000);
 </script></body></html>
