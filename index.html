@@ -73,6 +73,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 .bill.pop{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}@keyframes pop{from{transform:scale(.3) rotate(-20deg);opacity:0}}
 #themeBar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:center;padding:16px 0 2px}#themeBar[hidden]{display:none}
 #themeBar button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}#themeBar button.on{border-color:var(--hi)}#themeBar button.mode{width:auto;border-radius:22px;padding:0 14px;background:var(--bg2);color:var(--g);font-weight:700;font-size:15px;border:1px solid var(--line)}
+.lnk{background:var(--bg2);border:1px solid var(--line);color:var(--g);border-radius:12px;padding:10px 16px;font-weight:700;font-size:15px;margin:12px 0 0}.lnk:disabled{opacity:.35}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -104,6 +105,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 
 <div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
 <div id="stackImg"></div><div id="stackLegend" style="margin-top:14px;font-size:15px"></div>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="lnk" id="sumBtn">Weekly summary</button><button class="lnk" id="taxBtn">Add tax estimate</button></div>
 <b id="stackAmt">$0.00</b></div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
@@ -111,6 +113,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <p style="text-align:center;margin-top:40px">Overtime, missed punches, and shift notes now live in the menu above.</p>
 <p style="text-align:center;border-top:1px solid var(--line);padding-top:30px;margin-top:30px">Shift Watch — track your hours, see what you earn.</p>
 <p style="text-align:center;margin:-10px 0 0">More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a></p>
+<p style="text-align:center;font-size:13px;margin:22px 0 0">Estimates only, not payroll. Your employer’s pay, overtime, and tax rules may differ.</p>
 </main>
 
 <div class="modal" id="modal">
@@ -119,6 +122,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><b id="otWorked" style="color:var(--g);font-size:32px">0h 00m worked</b><span id="otLeft" style="font-size:18px;color:var(--gb)"></span></div>
 <div class="bar"><i id="otBar"></i></div>
 <small class="n" id="otNote"></small></div>
+<div class="sec"><h2>Take-home estimate</h2><p>Enter a rough combined tax percentage (federal, state, Social Security and Medicare). Your pay stub shows what is really withheld.</p><div class="lab">Estimated taxes (%)</div><input class="in" type="number" id="optTax" step="0.5" min="0" max="60" placeholder="e.g. 20" style="font-size:22px;margin-top:10px"></div>
 <div class="sec"><h2>Shift notes</h2><p>Jot down what you worked on — it attaches when you save the shift.</p>
 <textarea class="in" id="notes" rows="4" style="font-size:18px" placeholder="e.g. Covered the front counter, trained the new hire…"></textarea>
 <small class="n">Saved automatically and cleared once the shift is saved.</small></div>
@@ -133,6 +137,14 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div class="two" style="margin-top:20px"><div><div class="lab">Hours</div><input class="in" type="number" step="0.25" id="pH" value="8" style="font-size:20px;margin-top:10px"></div><div><div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="pR" style="font-size:20px;margin-top:10px"></div></div>
 <button class="go" id="addPto">Add PTO</button></div>
 <div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
+<div class="sec"><h2>Setup</h2><p>Change your hourly rate, overtime rules, and tax estimate in one place.</p><button class="go" id="suAgain" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Open setup</button></div>
+<div class="sec"><h2>Backup &amp; restore</h2><p>Your shifts live only in this browser. Save a backup so you can move to a new phone or recover after clearing data.</p>
+<button class="go" id="bkExport">Export to file</button>
+<button class="go" id="bkCopy" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Copy backup text</button>
+<button class="go" id="bkImportBtn" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Import from file</button><input type="file" id="bkFile" accept=".json,application/json" hidden>
+<textarea class="in" id="bkText" rows="3" style="font-size:15px;margin-top:14px" placeholder="Or paste backup text here"></textarea>
+<button class="go" id="bkPaste" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Restore from pasted text</button>
+<small class="n">If your browser blocks downloads, use Copy backup text and paste it into a note. Importing adds shifts that aren’t already in the app and restores the settings in the backup.</small></div>
 <div class="sec"><h2>More apps</h2><p>Check out my other apps and games.</p><a class="go" href="https://keyek302.github.io" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Visit keyek302.github.io</a></div>
 <div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee. More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a>.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
 <div class="sec"><h2>Goal widget</h2><p>Keep your “to go” amount on the home-screen app icon while you work.</p>
@@ -152,6 +164,20 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div class="lab" style="margin-top:20px">Notes</div><textarea class="in" id="eNote" rows="3" style="font-size:18px;margin-top:10px"></textarea>
 <button class="go" id="eSave">Save changes</button><button class="go" id="eDel" style="background:var(--bg2);color:var(--red);border:1px solid var(--line)">Delete shift</button></div></div>
 <div class="modal" id="askM" style="background:rgba(0,0,0,.65);z-index:40"><div style="max-width:340px;margin:30vh 22px 0;padding:24px;background:var(--bg);border:1px solid var(--line);border-radius:18px;margin-left:auto;margin-right:auto"><p id="askT" style="margin:0 0 18px;font-size:19px;color:var(--hi)"></p><div class="grid"><button class="b rst" id="askN">Cancel</button><button class="b" id="askY" style="background:var(--red)">Yes</button></div></div></div>
+<div class="modal" id="setupM"><div class="mh"><h2>Welcome</h2><button id="suSkip" aria-label="Skip">✕</button></div>
+<div class="sec"><h2>Set up Shift Watch</h2><p>Takes about ten seconds. You can change all of this later in Options.</p>
+<div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="suRate" placeholder="e.g. 25.00" style="font-size:22px;margin-top:10px">
+<div class="tog" style="margin-top:22px"><div><h3>Overtime pay</h3><p>Higher rate after a set number of worked hours each week.</p></div><input type="checkbox" id="suOT" checked></div>
+<div class="two"><div><div class="lab">After (hrs/wk)</div><input class="in" type="number" id="suAfter" style="font-size:22px;margin-top:10px"></div><div><div class="lab">Multiplier</div><input class="in" type="number" step="0.1" id="suMult" style="font-size:22px;margin-top:10px"></div></div>
+<div class="lab" style="margin-top:22px">Estimated taxes (%)</div><input class="in" type="number" step="0.5" id="suTax" placeholder="Optional, e.g. 20" style="font-size:22px;margin-top:10px">
+<small class="n">Used for the take-home estimate. A rough combined number is fine.</small>
+<button class="go" id="suGo">Get started</button><small class="n">Estimates only, not payroll.</small></div></div>
+<div class="modal" id="sumM"><div class="mh"><h2>Weekly summary</h2><button id="sumClose" aria-label="Close">✕</button></div>
+<div class="sec"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><button class="lnk" id="sumPrev" aria-label="Previous week" style="margin:0">◀</button><b id="sumRange" style="color:var(--g);font-size:19px;text-align:center"></b><button class="lnk" id="sumNext" aria-label="Next week" style="margin:0">▶</button></div>
+<div id="sumCard" style="margin-top:18px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px"></div>
+<button class="go" id="sumShare">Share summary</button>
+<button class="go" id="sumCopy" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Copy text</button>
+<small class="n">You can also screenshot the card above.</small></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -204,7 +230,7 @@ function render(){
   const d=document.createElement('details');d.className='wk';d.open=openWk[w]!==undefined?openWk[w]:w===ws;d.ontoggle=()=>{openWk[w]=d.open};
   const sm=document.createElement('summary'),sub=document.createElement('small');sm.textContent=fm(w)+' – '+fm(we.getTime());
   sub.textContent=money(inW.reduce((t,q)=>t+q.pay,0))+' · '+(inW.reduce((t,q)=>t+q.worked,0)/3600000).toFixed(1)+' hrs';sm.append(sub);
-  const b=document.createElement('div');d.append(sm,b);$('list').append(d);grp[w]={b}}return grp[w].b};
+  const b=document.createElement('div'),sb=document.createElement('button');sb.className='lnk';sb.textContent='📤 Weekly summary';sb.onclick=()=>openSummary(w);b.append(sb);d.append(sm,b);$('list').append(d);grp[w]={b}}return grp[w].b};
  [...S.shifts].sort((a,b)=>b.start-a.start).forEach(s=>{
   const el=document.createElement('div');el.className='shift';
   const l=document.createElement('div');
@@ -261,7 +287,7 @@ function drawStack(total,e,earned){
   list.forEach(x=>{const ov=Math.min(pos+x[0],(i+1)*U)-Math.max(pos,i*U);if(ov>0)s+='<em class="'+x[1]+'" style="width:'+(ov/U*100).toFixed(1)+'%"></em>';pos+=x[0]});
   h+='<div class="bill'+(prevN>0&&i>=prevN?' pop':'')+'" style="transform:rotate('+rot[i%4]+'deg)"><div class="bf">'+s+'</div><div class="bd"><span>100</span><i></i><span>100</span></div></div>'}
  prevN=nb;if($('stackImg').dataset.h!==h){$('stackImg').dataset.h=h;$('stackImg').innerHTML=h}
- $('stackLegend').innerHTML='<div style="font-size:17px;color:var(--hi);margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')}
+ $('stackLegend').innerHTML='<div style="font-size:17px;color:var(--hi);margin-bottom:6px">'+full+' × $100 + '+money(total-full*U)+'</div>'+list.map(x=>'<span style="color:'+x[3]+';margin:0 8px;white-space:nowrap">● '+x[2]+' '+money(x[0])+'</span>').join('')+tkLine(total);$('taxBtn').hidden=(S.opt.tax||0)>0}
 function goalMs(){const r=S.run,en=S.sched&&S.sched.end,n=Date.now(),G=GOAL_H*3600000;
  if(!r||!en||en<=n)return G;
  let w;
@@ -373,5 +399,62 @@ const tb=$('themeBar');const mb=document.createElement('button');mb.id='modeBtn'
 Object.keys(THEMES).forEach(n=>{const b=document.createElement('button');b.dataset.t=n;b.setAttribute('aria-label',n+' theme');b.style.background='linear-gradient(135deg,'+THEMES[n].gb+','+THEMES[n].g+')';b.onclick=()=>{applyTheme(n);tb.hidden=true};tb.append(b)});
 $('bTheme').onclick=()=>{tb.hidden=!tb.hidden};
 applyLook();
+function bkData(){return JSON.stringify({app:'shiftwatch',version:1,exported:new Date().toISOString(),shifts:S.shifts,rate:$('rate').value,opt:S.opt,theme:S.theme,mode:S.mode},null,1)}
+function dl(txt,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+$('bkExport').onclick=()=>{dl(bkData(),'shiftwatch-backup-'+lday(0)+'.json');toast('Backup created')};
+$('bkCopy').onclick=async()=>{const t=bkData();try{await navigator.clipboard.writeText(t);toast('Backup copied')}catch(e){$('bkText').value=t;$('bkText').select();toast('Copy the text from the box')}};
+$('bkImportBtn').onclick=()=>$('bkFile').click();
+$('bkFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>importText(String(r.result));r.readAsText(f);e.target.value=''};
+$('bkPaste').onclick=()=>importText($('bkText').value);
+async function importText(txt){let b;try{b=JSON.parse(txt)}catch(e){return toast('That isn’t a valid backup')}
+ if(!b||b.app!=='shiftwatch'||!Array.isArray(b.shifts))return toast('That isn’t a Shift Watch backup');
+ const ok=b.shifts.filter(x=>x&&['start','end','worked','pay','rate'].every(k=>Number.isFinite(x[k])));
+ const have=new Set(S.shifts.map(x=>x.id)),add=ok.filter(x=>!have.has(x.id));
+ if(!(await ask('Import '+add.length+' new shift'+(add.length===1?'':'s')+' from this backup? Settings in the backup will replace your current ones.')))return;
+ let n=0;add.forEach(x=>{S.shifts.push(Object.assign({id:Number.isFinite(x.id)?x.id:Date.now()+(n++),start:x.start,end:x.end,worked:x.worked,brk:Number.isFinite(x.brk)?x.brk:0,rate:x.rate,pay:x.pay,note:typeof x.note==='string'?x.note:''},x.pto?{pto:true,kind:String(x.kind||'PTO')}:{}))});
+ if(b.rate!==undefined&&Number.isFinite(parseFloat(b.rate))){$('rate').value=b.rate;S.rate=String(b.rate)}
+ if(b.opt&&typeof b.opt==='object')['badge','notify','live','ot','otAfter','otMult','tax'].forEach(k=>{if(b.opt[k]!==undefined)S.opt[k]=b.opt[k]});
+ if(THEMES[b.theme])S.theme=b.theme;if(b.mode==='light'||b.mode==='dark')S.mode=b.mode;
+ [['optBadge','badge'],['optLive','live'],['optNotify','notify'],['optOT','ot'],['otAfter','otAfter'],['otMult','otMult']].forEach(([id,k])=>{const e=$(id);if(e.type==='checkbox')e.checked=!!S.opt[k];else e.value=S.opt[k]});
+ applyLook();save();render();$('bkText').value='';toast('Backup imported')}
+const hmf=h=>{const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'};
+const fmd=ms=>new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+function tkLine(total){const t=S.opt.tax||0;return t>0?'<div style="margin-top:10px;font-size:15px">Est. take-home <span style="font-weight:700;color:var(--hi)">'+money(total*(1-t/100))+'</span> after '+t+'% taxes</div>':''}
+function refreshOpts(){[['optBadge','badge'],['optLive','live'],['optNotify','notify'],['optOT','ot'],['otAfter','otAfter'],['otMult','otMult'],['optTax','tax']].forEach(([id,k])=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!S.opt[k];else e.value=S.opt[k]==null?'':S.opt[k]})}
+$('optTax').onchange=()=>{S.opt.tax=Math.max(0,Math.min(60,parseFloat($('optTax').value)||0));$('optTax').value=S.opt.tax||'';save();tick()};
+$('taxBtn').onclick=()=>{open();setTimeout(()=>{const e=$('optTax');e.scrollIntoView({block:'center'});e.focus()},80)};
+function openSetup(){$('suRate').value=$('rate').value;$('suOT').checked=!!S.opt.ot;$('suAfter').value=S.opt.otAfter||40;$('suMult').value=S.opt.otMult||1.5;$('suTax').value=S.opt.tax||'';$('setupM').classList.add('on')}
+$('suAgain').onclick=()=>{$('modal').classList.remove('on');openSetup()};
+$('suSkip').onclick=()=>{S.setupDone=true;save();$('setupM').classList.remove('on')};
+$('suGo').onclick=()=>{const r=parseFloat($('suRate').value);if(!(r>0))return toast('Enter your hourly rate');
+ $('rate').value=r;S.rate=String(r);S.opt.ot=$('suOT').checked;S.opt.otAfter=parseFloat($('suAfter').value)||40;S.opt.otMult=parseFloat($('suMult').value)||1.5;S.opt.tax=Math.max(0,Math.min(60,parseFloat($('suTax').value)||0));
+ S.setupDone=true;refreshOpts();save();tick();render();$('setupM').classList.remove('on');toast('All set')};
+refreshOpts();
+let sumW=0;
+function weekData(w){const lim=S.opt.otAfter||40,sh=S.shifts.filter(x=>weekStart(x.start)===w).sort((a,b)=>a.start-b.start),days={};let reg=0,ot=0,pto=0,rh=0,oh=0,ph=0,prior=0;
+ sh.forEach(x=>{const h=x.worked/3600000;if(x.pto){pto+=x.pay;ph+=h;return}
+  const r=S.opt.ot?Math.max(0,Math.min(h,lim-prior)):h,rp=r*x.rate;reg+=rp;ot+=Math.max(0,x.pay-rp);rh+=r;oh+=h-r;prior+=h;days[dstr(x.start)]=1});
+ return{sh,reg,ot,pto,rh,oh,ph,gross:sh.reduce((t,x)=>t+x.pay,0),days:Object.keys(days).length,tax:S.opt.tax||0}}
+function sumHtml(d){const row=(a,b,c)=>'<div style="display:flex;justify-content:space-between;gap:10px;margin:8px 0"><span>'+a+'</span><span style="font-weight:700;color:'+(c||'var(--hi)')+'">'+b+'</span></div>';
+ let h='<div style="text-align:center"><div class="lab">Gross pay</div><div style="font-size:40px;font-weight:700;color:var(--gb)">'+money(d.gross)+'</div>'+(d.tax>0?'<div>Est. take-home '+money(d.gross*(1-d.tax/100))+' after '+d.tax+'% taxes</div>':'')+'</div><div style="margin-top:18px">';
+ h+=row('Hours worked',hmf(d.rh+d.oh));if(d.oh>0.001)h+=row('Overtime hours',hmf(d.oh),'#ffd447');if(d.ph>0)h+=row('PTO hours',hmf(d.ph),'#4da3ff');
+ h+=row('Regular pay',money(d.reg),'#2fbf4f');if(d.ot>0.004)h+=row('Overtime pay',money(d.ot),'#ffd447');if(d.pto>0.004)h+=row('PTO pay',money(d.pto),'#4da3ff');
+ h+=row('Days worked',d.days)+'</div>';
+ h+='<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:15px">';
+ d.sh.forEach(x=>{h+=row(new Date(x.start).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+(x.pto?' · '+(x.kind||'PTO'):''),hmf(x.worked/3600000)+' · '+money(x.pay),'var(--tx)')});
+ return h+'</div>'}
+function sumText(d){const we=new Date(sumW);we.setDate(we.getDate()+6);let t='Shift Watch · '+fmd(sumW)+' – '+fmd(we.getTime())+'\n';
+ t+='Gross pay: '+money(d.gross)+'\n';if(d.tax>0)t+='Est. take-home: '+money(d.gross*(1-d.tax/100))+' ('+d.tax+'% taxes)\n';
+ t+='Hours worked: '+hmf(d.rh+d.oh)+(d.oh>0.001?' ('+hmf(d.oh)+' overtime)':'')+'\n';if(d.ph>0)t+='PTO: '+hmf(d.ph)+'\n';
+ t+='Regular '+money(d.reg)+(d.ot>0.004?' · Overtime '+money(d.ot):'')+(d.pto>0.004?' · PTO '+money(d.pto):'')+'\n';return t+'Days worked: '+d.days}
+function showSum(){const d=weekData(sumW),we=new Date(sumW);we.setDate(we.getDate()+6);$('sumRange').textContent=fmd(sumW)+' – '+fmd(we.getTime());
+ $('sumCard').innerHTML=d.sh.length?sumHtml(d):'<p style="text-align:center;margin:0">No shifts saved this week.</p>';$('sumNext').disabled=sumW>=weekStart(Date.now())}
+function openSummary(w){sumW=w;showSum();$('sumM').classList.add('on')}
+const stepW=n=>{const x=new Date(sumW);x.setDate(x.getDate()+n*7);sumW=x.getTime();showSum()};
+$('sumPrev').onclick=()=>stepW(-1);$('sumNext').onclick=()=>stepW(1);$('sumClose').onclick=()=>$('sumM').classList.remove('on');
+$('sumBtn').onclick=()=>openSummary(weekStart(Date.now()));
+$('sumShare').onclick=async()=>{const t=sumText(weekData(sumW));try{if(navigator.share)await navigator.share({title:'Shift Watch weekly summary',text:t});else{await navigator.clipboard.writeText(t);toast('Summary copied')}}catch(e){}};
+$('sumCopy').onclick=async()=>{try{await navigator.clipboard.writeText(sumText(weekData(sumW)));toast('Summary copied')}catch(e){toast('Couldn’t copy. Try Share instead')}};
+if(!S.setupDone){if(S.shifts.length||S.run){S.setupDone=true;save()}else openSetup()}
 render();setInterval(tick,1000);
 </script></body></html>
