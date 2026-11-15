@@ -74,6 +74,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 #themeBar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:center;padding:16px 0 2px}#themeBar[hidden]{display:none}
 #themeBar button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}#themeBar button.on{border-color:var(--hi)}#themeBar button.mode{width:auto;border-radius:22px;padding:0 14px;background:var(--bg2);color:var(--g);font-weight:700;font-size:15px;border:1px solid var(--line)}
 .lnk{background:var(--bg2);border:1px solid var(--line);color:var(--g);border-radius:12px;padding:10px 16px;font-weight:700;font-size:15px;margin:12px 0 0}.lnk:disabled{opacity:.35}
+.brow{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}.brow small{display:block;color:var(--tx);font-size:14px}.brow button{background:none;color:var(--tx);font-size:20px;padding:6px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -105,7 +106,7 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 
 <div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
 <div id="stackImg"></div><div id="stackLegend" style="margin-top:14px;font-size:15px"></div>
-<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="lnk" id="sumBtn">Weekly summary</button><button class="lnk" id="taxBtn">Add tax estimate</button></div>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="lnk" id="sumBtn">Weekly summary</button><button class="lnk" id="taxBtn">Add tax estimate</button><button class="lnk" id="budBtn">💰 Budget</button></div>
 <b id="stackAmt">$0.00</b></div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
@@ -178,6 +179,35 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <button class="go" id="sumShare">Share summary</button>
 <button class="go" id="sumCopy" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Copy text</button>
 <small class="n">You can also screenshot the card above.</small></div></div>
+<div class="modal" id="budM"><div class="mh"><h2>Budget</h2><div style="display:flex;align-items:center;gap:8px"><button id="goalBtn" aria-label="Savings goals" style="font-size:24px">🐷</button><button id="budClose" aria-label="Close">✕</button></div></div>
+<div class="sec"><div class="lab" id="budRange"></div>
+<div style="margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px"><div id="budGoalBox"></div><div id="budSum"></div></div>
+<small class="n" id="budNote"></small></div>
+<div class="sec"><h2>Bill calendar</h2><div class="lab">Payday</div><select class="in" id="payDay" style="font-size:20px;margin-top:10px"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select>
+<div id="calWarn" style="margin-top:14px"></div><div id="calGrid" style="margin-top:14px"></div>
+<small class="n">Red days have bills due before your next payday. 💵 marks payday. Weekly bills with no set day count on payday.</small><div id="calList"></div></div>
+<div class="sec"><h2>Bills</h2><div id="billList"></div>
+<div class="lab" style="margin-top:18px" id="billFormT">Add a bill</div>
+<input class="in" id="bName" placeholder="Name (e.g. Rent)" style="font-size:20px;margin-top:10px">
+<div class="two" style="margin-top:12px"><input class="in" type="number" step="0.01" id="bAmt" placeholder="Amount" style="font-size:20px"><select class="in" id="bFreq" style="font-size:20px"><option value="weekly">Every week</option><option value="monthly">Monthly</option></select></div>
+<select class="in" id="bWd" style="font-size:18px;margin-top:12px"><option value="">Any day (counts on payday)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select>
+<input class="in" type="number" id="bDay" min="1" max="31" placeholder="Day of the month it’s due (1-31)" style="font-size:18px;margin-top:12px" hidden>
+<button class="go" id="bAdd">Add bill</button><button class="go" id="bCancel" hidden style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Cancel edit</button></div>
+<div class="sec" style="padding-bottom:60px"><h2>Spending</h2><p>Log purchases to see what is left this week.</p>
+<input class="in" type="number" step="0.01" id="sAmt" placeholder="Amount" style="font-size:20px"><small class="n" id="sHrs"></small>
+<input class="in" id="sNote" placeholder="What for? (optional)" style="font-size:18px;margin-top:6px">
+<button class="go" id="sAdd">Log spending</button><div id="spendList" style="margin-top:16px"></div></div>
+
+</div>
+<div class="modal" id="goalM"><div class="mh"><h2>Savings goals</h2><button id="goalClose" aria-label="Close">✕</button></div>
+<div class="sec" style="padding-bottom:60px"><h2>Savings goals</h2><div id="goalList"></div>
+<div class="lab" style="margin-top:18px" id="goalFormT">Add a goal</div>
+<input class="in" id="gName" placeholder="Goal (e.g. Emergency fund)" style="font-size:20px;margin-top:10px">
+<div class="two" style="margin-top:12px"><input class="in" type="number" step="0.01" id="gTarget" placeholder="Target $" style="font-size:20px"><input class="in" type="number" step="0.01" id="gSaved" placeholder="Saved so far" style="font-size:20px"></div>
+<button class="go" id="gAdd">Add goal</button><button class="go" id="gCancel" hidden style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Cancel edit</button>
+<div class="lab" style="margin-top:26px">Add or take out money</div>
+<select class="in" id="gSel" style="font-size:20px;margin-top:10px"></select><input class="in" type="number" step="0.01" id="gAmt" placeholder="Amount" style="font-size:20px;margin-top:12px">
+<div class="two" style="margin-top:12px"><button class="go" id="gPut" style="margin:0">Add</button><button class="go" id="gTake" style="margin:0;background:var(--bg2);color:var(--g);border:1px solid var(--line)">Take out</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -202,7 +232,7 @@ function tick(){
  const e=elapsed(),r=rate(),run=S.run;
  const earned=Math.max(0,pay(e,r,weekHours()));
  $('clock').textContent=hms(e);$('earn').textContent=money(earned);const wsT=weekStart(Date.now()),we=new Date(wsT);we.setDate(we.getDate()+6);const fd=m=>new Date(m).toLocaleDateString('en-US',{month:'short',day:'numeric'});
- const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);drawStack(pTot,e,earned);otStat(e);$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
+ const pTot=S.shifts.filter(x=>x.start>=wsT).reduce((t,x)=>t+x.pay,0)+earned;$('stackAmt').textContent=money(pTot);lastPTot=pTot;drawStack(pTot,e,earned);otStat(e);if($('budM').classList.contains('on'))budSum();$('payRange').textContent='Sun '+fd(wsT)+' – Sat '+fd(we);
  const sc=S.run&&S.sched&&S.sched.end>Date.now()?S.sched.end:0,tl=sc?new Date(sc).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'',gm=goalMs(),goal=pay(gm,r,weekHours()),left=Math.max(0,goal-earned);
  $('toGo').textContent=money(left);$('toGoT').textContent=hms(gm-e);
  $('goalLab').textContent=sc?'Goal until '+tl:GOAL_H+'-hour goal';$('goalAmt').textContent=money(goal);$('goalTxt').textContent=(sc?'what you earn if you clock out at '+tl:'what a full '+GOAL_H+'-hour shift pays at '+money(r)+'/hr')+(goal>r*gm/3600000+.005?' with overtime':'');
@@ -399,7 +429,7 @@ const tb=$('themeBar');const mb=document.createElement('button');mb.id='modeBtn'
 Object.keys(THEMES).forEach(n=>{const b=document.createElement('button');b.dataset.t=n;b.setAttribute('aria-label',n+' theme');b.style.background='linear-gradient(135deg,'+THEMES[n].gb+','+THEMES[n].g+')';b.onclick=()=>{applyTheme(n);tb.hidden=true};tb.append(b)});
 $('bTheme').onclick=()=>{tb.hidden=!tb.hidden};
 applyLook();
-function bkData(){return JSON.stringify({app:'shiftwatch',version:1,exported:new Date().toISOString(),shifts:S.shifts,rate:$('rate').value,opt:S.opt,theme:S.theme,mode:S.mode},null,1)}
+function bkData(){return JSON.stringify({app:'shiftwatch',version:1,exported:new Date().toISOString(),shifts:S.shifts,rate:$('rate').value,opt:S.opt,theme:S.theme,mode:S.mode,budget:S.budget},null,1)}
 function dl(txt,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 $('bkExport').onclick=()=>{dl(bkData(),'shiftwatch-backup-'+lday(0)+'.json');toast('Backup created')};
 $('bkCopy').onclick=async()=>{const t=bkData();try{await navigator.clipboard.writeText(t);toast('Backup copied')}catch(e){$('bkText').value=t;$('bkText').select();toast('Copy the text from the box')}};
@@ -415,6 +445,11 @@ async function importText(txt){let b;try{b=JSON.parse(txt)}catch(e){return toast
  if(b.rate!==undefined&&Number.isFinite(parseFloat(b.rate))){$('rate').value=b.rate;S.rate=String(b.rate)}
  if(b.opt&&typeof b.opt==='object')['badge','notify','live','ot','otAfter','otMult','tax'].forEach(k=>{if(b.opt[k]!==undefined)S.opt[k]=b.opt[k]});
  if(THEMES[b.theme])S.theme=b.theme;if(b.mode==='light'||b.mode==='dark')S.mode=b.mode;
+ if(b.budget&&typeof b.budget==='object'){const hv=new Set(S.budget.bills.map(x=>x.id)),sv=new Set(S.budget.spend.map(x=>x.id));
+  (Array.isArray(b.budget.bills)?b.budget.bills:[]).forEach(x=>{if(x&&typeof x.name==='string'&&Number.isFinite(x.amt)&&!hv.has(x.id))S.budget.bills.push({id:Number.isFinite(x.id)?x.id:Date.now()+Math.random(),name:x.name.slice(0,60),amt:x.amt,freq:x.freq==='monthly'?'monthly':'weekly',day:Math.min(31,Math.max(1,Math.round(x.day)||1)),wd:Number.isInteger(x.wd)&&x.wd>=0&&x.wd<=6?x.wd:null})});
+  (Array.isArray(b.budget.spend)?b.budget.spend:[]).forEach(x=>{if(x&&Number.isFinite(x.amt)&&Number.isFinite(x.ts)&&!sv.has(x.id))S.budget.spend.push({id:Number.isFinite(x.id)?x.id:Date.now()+Math.random(),ts:x.ts,amt:x.amt,note:typeof x.note==='string'?x.note.slice(0,80):''})});
+  if(Number.isInteger(b.budget.payday)&&b.budget.payday>=0&&b.budget.payday<=6)S.budget.payday=b.budget.payday;
+  const gv=new Set(S.budget.goals.map(x=>x.id));(Array.isArray(b.budget.goals)?b.budget.goals:[]).forEach(x=>{if(x&&typeof x.name==='string'&&Number.isFinite(x.target)&&Number.isFinite(x.saved)&&!gv.has(x.id))S.budget.goals.push({id:Number.isFinite(x.id)?x.id:Date.now()+Math.random(),name:x.name.slice(0,60),target:x.target,saved:x.saved})})}
  [['optBadge','badge'],['optLive','live'],['optNotify','notify'],['optOT','ot'],['otAfter','otAfter'],['otMult','otMult']].forEach(([id,k])=>{const e=$(id);if(e.type==='checkbox')e.checked=!!S.opt[k];else e.value=S.opt[k]});
  applyLook();save();render();$('bkText').value='';toast('Backup imported')}
 const hmf=h=>{const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'};
@@ -456,5 +491,81 @@ $('sumBtn').onclick=()=>openSummary(weekStart(Date.now()));
 $('sumShare').onclick=async()=>{const t=sumText(weekData(sumW));try{if(navigator.share)await navigator.share({title:'Shift Watch weekly summary',text:t});else{await navigator.clipboard.writeText(t);toast('Summary copied')}}catch(e){}};
 $('sumCopy').onclick=async()=>{try{await navigator.clipboard.writeText(sumText(weekData(sumW)));toast('Summary copied')}catch(e){toast('Couldn’t copy. Try Share instead')}};
 if(!S.setupDone){if(S.shifts.length||S.run){S.setupDone=true;save()}else openSetup()}
+let lastPTot=0,billEdit=null;
+S.budget=S.budget||{};S.budget.bills=S.budget.bills||[];S.budget.spend=S.budget.spend||[];S.budget.goals=S.budget.goals||[];if(!Number.isInteger(S.budget.payday))S.budget.payday=5;
+const netRate=()=>(rate()||0)*(1-(S.opt.tax||0)/100);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sm=n=>(n<0?'−':'')+money(Math.abs(n)),ord=n=>{const v=n%100;return v>=11&&v<=13?'th':({1:'st',2:'nd',3:'rd'}[n%10]||'th')};
+function billsIn(w){const we=new Date(w);we.setDate(we.getDate()+7);const out=[];
+ S.budget.bills.forEach(b=>{if(b.freq==='weekly')out.push({b});else for(let d=new Date(w);d<we;d.setDate(d.getDate()+1)){const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();if(d.getDate()===Math.min(b.day||1,dim))out.push({b})}});return out}
+function budSum(){budGoalBox();const ws=weekStart(Date.now()),we=new Date(ws);we.setDate(we.getDate()+6);
+ const dueT=billsIn(ws).reduce((t,x)=>t+x.b.amt,0),nw=new Date(ws);nw.setDate(nw.getDate()+7);const nextT=billsIn(nw.getTime()).reduce((t,x)=>t+x.b.amt,0);
+ const spent=S.budget.spend.filter(x=>x.ts>=ws).reduce((t,x)=>t+x.amt,0),tax=S.opt.tax||0,take=lastPTot*(1-tax/100),left=take-dueT-spent,dl=7-new Date().getDay();
+ const row=(a,b,c)=>'<div style="display:flex;justify-content:space-between;gap:10px;margin:8px 0"><span>'+a+'</span><span style="font-weight:700;color:'+(c||'var(--hi)')+'">'+b+'</span></div>';
+ $('budRange').textContent='Pay period '+fmd(ws)+' – '+fmd(we.getTime());
+ $('budSum').innerHTML='<div style="text-align:center"><div class="lab">Left this week</div><div style="font-size:42px;font-weight:700;color:'+(left<0?'var(--red)':'var(--gb)')+'">'+sm(left)+'</div>'+(left>0?'<div>About '+money(left/dl)+' a day for the rest of the week</div>':'')+'</div><div style="margin-top:16px">'+row('Take-home so far',money(take),'var(--g)')+row('Bills due this week','− '+money(dueT))+row('Spending logged','− '+money(spent))+'</div>'+(dueT>0&&netRate()>0?'<div style="font-size:14px">This week’s bills equal '+hmf(dueT/netRate())+' of work.</div>':'')+(nextT>0?'<div style="font-size:14px;margin-top:6px">Next week’s bills: '+money(nextT)+'</div>':'');
+ $('budNote').textContent=tax>0?'Take-home uses your '+tax+'% tax estimate and includes the shift that is running.':'No tax estimate is set, so take-home equals gross pay. Add one in Options for a better number.'}
+function budLists(){budCal();const bl=$('billList'),sl=$('spendList'),ws=weekStart(Date.now());bl.innerHTML='';sl.innerHTML='';
+ if(!S.budget.bills.length)bl.innerHTML='<p>No bills yet. Add rent, phone, a car payment, and so on.</p>';
+ S.budget.bills.forEach(b=>{const el=document.createElement('div');el.className='brow';
+  el.innerHTML='<div><span style="font-weight:700;color:var(--g)">'+esc(b.name)+'</span><small>'+(b.freq==='weekly'?'Every '+(Number.isInteger(b.wd)?DAYS[b.wd]:'week'):'Monthly, due the '+b.day+ord(b.day))+(netRate()>0?' · '+hmf(b.amt/netRate())+' of work':'')+'</small></div><div style="display:flex;align-items:center;gap:2px"><span style="font-weight:700;color:var(--hi)">'+money(b.amt)+'</span><button data-e="1" aria-label="Edit bill">✎</button><button data-d="1" aria-label="Delete bill">🗑</button></div>';
+  el.querySelector('[data-e]').onclick=()=>editBill(b);
+  el.querySelector('[data-d]').onclick=async()=>{if(await ask('Delete the bill “'+b.name+'”?')){S.budget.bills=S.budget.bills.filter(x=>x.id!==b.id);save();budLists();budSum()}};
+  bl.append(el)});
+ S.budget.spend.filter(x=>x.ts>=ws).sort((a,b)=>b.ts-a.ts).forEach(x=>{const el=document.createElement('div');el.className='brow';
+  el.innerHTML='<div><span style="font-weight:700;color:var(--hi)">'+esc(x.note||'Spending')+'</span><small>'+new Date(x.ts).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+(netRate()>0?' · '+hmf(x.amt/netRate())+' of work':'')+'</small></div><div style="display:flex;align-items:center;gap:2px"><span style="font-weight:700;color:var(--hi)">'+money(x.amt)+'</span><button aria-label="Delete">🗑</button></div>';
+  el.querySelector('button').onclick=()=>{S.budget.spend=S.budget.spend.filter(q=>q.id!==x.id);save();budLists();budSum()};sl.append(el)})}
+function resetBillForm(){billEdit=null;$('bName').value='';$('bAmt').value='';$('bDay').value='';$('bFreq').value='weekly';$('bDay').hidden=true;$('bWd').value='';$('bWd').hidden=false;$('bAdd').textContent='Add bill';$('bCancel').hidden=true;$('billFormT').textContent='Add a bill'}
+function editBill(b){billEdit=b.id;$('bName').value=b.name;$('bAmt').value=b.amt;$('bFreq').value=b.freq;$('bDay').value=b.freq==='monthly'?b.day:'';$('bDay').hidden=b.freq!=='monthly';$('bWd').value=Number.isInteger(b.wd)?b.wd:'';$('bWd').hidden=b.freq==='monthly';$('bAdd').textContent='Save bill';$('bCancel').hidden=false;$('billFormT').textContent='Edit bill';$('bName').scrollIntoView({block:'center'})}
+$('bFreq').onchange=()=>{const m=$('bFreq').value==='monthly';$('bDay').hidden=!m;$('bWd').hidden=m};$('bCancel').onclick=resetBillForm;
+$('bAdd').onclick=()=>{const name=$('bName').value.trim(),amt=parseFloat($('bAmt').value),freq=$('bFreq').value,dv=parseInt($('bDay').value);
+ if(!name||!(amt>0))return toast('Enter a name and an amount');if(freq==='monthly'&&!(dv>=1&&dv<=31))return toast('Enter the day of the month it is due');
+ const rec={id:billEdit||Date.now(),name:name.slice(0,60),amt,freq,day:freq==='monthly'?dv:1,wd:freq==='weekly'&&$('bWd').value!==''?parseInt($('bWd').value):null},i=S.budget.bills.findIndex(x=>x.id===billEdit);
+ if(i>=0)S.budget.bills[i]=rec;else S.budget.bills.push(rec);resetBillForm();save();budLists();budSum()};
+$('sAmt').oninput=()=>{const a=parseFloat($('sAmt').value);$('sHrs').textContent=a>0&&netRate()>0?'= '+hmf(a/netRate())+' of work at your take-home rate':''};
+$('sAdd').onclick=()=>{const a=parseFloat($('sAmt').value);if(!(a>0))return toast('Enter an amount');S.budget.spend.push({id:Date.now(),ts:Date.now(),amt:a,note:$('sNote').value.trim().slice(0,80)});$('sAmt').value='';$('sNote').value='';$('sHrs').textContent='';save();budLists();budSum();toast('Logged')};
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function dueOn(d){const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),pd=S.budget.payday,out=[];
+ S.budget.bills.forEach(b=>{if(b.freq==='weekly'){if(d.getDay()===(Number.isInteger(b.wd)?b.wd:pd))out.push(b)}else if(d.getDate()===Math.min(b.day||1,dim))out.push(b)});return out}
+function budCal(){const pd=S.budget.payday,t0=new Date();t0.setHours(0,0,0,0);$('payDay').value=pd;
+ const ws=new Date(weekStart(Date.now())),np=new Date(t0);while(np.getDay()!==pd)np.setDate(np.getDate()+1);
+ const before=[],lab=d=>d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+ let g='<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;font-size:11px;text-align:center">'+['S','M','T','W','T','F','S'].map(x=>'<div class="lab" style="font-size:11px;letter-spacing:0">'+x+'</div>').join('');
+ for(let i=0;i<28;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);const bl=dueOn(d),tot=bl.reduce((t,b)=>t+b.amt,0),isT=d.getTime()===t0.getTime(),isP=d.getDay()===pd,past=d<t0,risk=tot>0&&d>=t0&&d<np;
+  if(risk)bl.forEach(b=>before.push({b,d:new Date(d)}));
+  g+='<div style="border:1px solid '+(isT?'var(--gb)':'var(--line)')+';border-radius:8px;padding:4px 0;min-height:46px;background:'+(risk?'rgba(229,72,77,.22)':'var(--bg2)')+';opacity:'+(past?.5:1)+'">'+(d.getDate()===1?'<div style="font-size:10px">'+d.toLocaleDateString('en-US',{month:'short'})+'</div>':'')+'<div style="font-weight:700;color:var(--hi)">'+d.getDate()+(isP?'💵':'')+'</div>'+(tot>0?'<div style="color:var(--g);font-weight:700">$'+Math.round(tot)+'</div>':'')+'</div>'}
+ $('calGrid').innerHTML=g+'</div>';
+ const bt=before.reduce((t,x)=>t+x.b.amt,0);
+ $('calWarn').innerHTML=!S.budget.bills.length?'<div>Add bills below and they will show up here.</div>':before.length?'<div style="border:1px solid var(--red);border-radius:12px;padding:12px 14px;color:var(--hi)">⚠ '+before.length+' bill'+(before.length===1?'':'s')+' ('+money(bt)+') due before your next payday, '+lab(np)+'.</div>':'<div style="color:var(--g)">✓ No bills due before your next payday, '+lab(np)+'.</div>';
+ let rows='';for(let i=0;i<14;i++){const d=new Date(t0);d.setDate(t0.getDate()+i);const bl=dueOn(d);if(!bl.length)continue;const risk=d<np;
+  rows+='<div class="brow"><div><span style="font-weight:700;color:var(--hi)">'+(risk?'⚠ ':'')+lab(d)+'</span><small>'+bl.map(b=>esc(b.name)).join(', ')+'</small></div><span style="font-weight:700;color:var(--hi)">'+money(bl.reduce((t,b)=>t+b.amt,0))+'</span></div>'}
+ $('calList').innerHTML=rows?'<div class="lab" style="margin-top:16px">Next 14 days</div>'+rows:''}
+$('payDay').onchange=()=>{S.budget.payday=parseInt($('payDay').value);save();budCal()};
+let goalEdit=null;
+function avgShiftTake(){const w=S.shifts.filter(x=>!x.pto);return w.length?w.reduce((t,x)=>t+x.pay,0)/w.length*(1-(S.opt.tax||0)/100):0}
+function budGoals(){const gl=$('goalList'),sel=$('gSel'),cur=sel.value,avg=avgShiftTake();gl.innerHTML='';sel.innerHTML='';
+ if(!S.budget.goals.length)gl.innerHTML='<p>No goals yet. Add one below, like an emergency fund or a trip.</p>';
+ S.budget.goals.forEach(g=>{sel.add(new Option(g.name,g.id));const pct=g.target>0?Math.min(100,g.saved/g.target*100):0,left=Math.max(0,g.target-g.saved),n=avg>0?Math.ceil(left/avg):0,el=document.createElement('div');el.className='brow';el.style.display='block';
+  el.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-weight:700;color:var(--g)">'+esc(g.name)+'</span><span><button data-e="1" aria-label="Edit goal">✎</button><button data-d="1" aria-label="Delete goal">🗑</button></span></div><div class="bar"><i style="width:'+pct.toFixed(1)+'%"></i></div><small>'+money(g.saved)+' of '+money(g.target)+' · '+Math.round(pct)+'%'+(left<=0?' · Goal reached 🎉':avg>0?' · about '+n+' more shift'+(n===1?'':'s')+' at your average take-home of '+money(avg):'')+'</small>';
+  el.querySelector('[data-e]').onclick=()=>{goalEdit=g.id;$('gName').value=g.name;$('gTarget').value=g.target;$('gSaved').value=g.saved;$('gAdd').textContent='Save goal';$('gCancel').hidden=false;$('goalFormT').textContent='Edit goal';$('gName').scrollIntoView({block:'center'})};
+  el.querySelector('[data-d]').onclick=async()=>{if(await ask('Delete the goal “'+g.name+'”?')){S.budget.goals=S.budget.goals.filter(x=>x.id!==g.id);save();budGoals()}};
+  gl.append(el)});
+ if([...sel.options].some(o=>o.value===cur))sel.value=cur;budSum()}
+function resetGoalForm(){goalEdit=null;$('gName').value='';$('gTarget').value='';$('gSaved').value='';$('gAdd').textContent='Add goal';$('gCancel').hidden=true;$('goalFormT').textContent='Add a goal'}
+$('gCancel').onclick=resetGoalForm;
+$('gAdd').onclick=()=>{const name=$('gName').value.trim(),target=parseFloat($('gTarget').value),saved=Math.max(0,parseFloat($('gSaved').value)||0);
+ if(!name||!(target>0))return toast('Enter a goal name and a target');
+ const rec={id:goalEdit||Date.now(),name:name.slice(0,60),target,saved},i=S.budget.goals.findIndex(x=>x.id===goalEdit);
+ if(i>=0)S.budget.goals[i]=rec;else S.budget.goals.push(rec);resetGoalForm();save();budGoals()};
+const gMove=sign=>{const g=S.budget.goals.find(x=>String(x.id)===$('gSel').value),a=parseFloat($('gAmt').value);if(!g)return toast('Add a goal first');if(!(a>0))return toast('Enter an amount');
+ g.saved=Math.max(0,g.saved+sign*a);$('gAmt').value='';save();budGoals();toast(sign>0?'Added to '+g.name:'Taken out of '+g.name)};
+$('gPut').onclick=()=>gMove(1);$('gTake').onclick=()=>gMove(-1);
+function budGoalBox(){const gs=S.budget.goals,el=$('budGoalBox');
+ let h=gs.length?gs.slice(0,2).map(g=>{const pct=g.target>0?Math.min(100,g.saved/g.target*100):0;return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:8px"><span style="font-weight:700;color:var(--g)">🐷 '+esc(g.name)+'</span><span style="font-weight:700;color:var(--hi)">'+Math.round(pct)+'%</span></div><div class="bar" style="background:var(--bg)"><i style="width:'+pct.toFixed(1)+'%"></i></div><small style="display:block;color:var(--tx)">'+money(g.saved)+' of '+money(g.target)+'</small></div>'}).join('')+(gs.length>2?'<small style="color:var(--tx)">+'+(gs.length-2)+' more goal'+(gs.length-2===1?'':'s')+'</small>':''):'<small style="color:var(--tx)">No savings goal yet.</small>';
+ h='<div style="border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px;cursor:pointer">'+h+'<small style="display:block;color:var(--gb);margin-top:6px">Tap to open savings goals</small></div>';
+ if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}}
+$('budGoalBox').onclick=()=>$('goalBtn').click();
+$('goalBtn').onclick=()=>{budGoals();$('goalM').classList.add('on')};$('goalClose').onclick=()=>{$('goalM').classList.remove('on');budSum()};
+$('budBtn').onclick=()=>{budLists();budSum();budGoals();$('budM').classList.add('on')};$('budClose').onclick=()=>$('budM').classList.remove('on');
 render();setInterval(tick,1000);
 </script></body></html>
