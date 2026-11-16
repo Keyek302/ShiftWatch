@@ -75,6 +75,21 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 #themeBar button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}#themeBar button.on{border-color:var(--hi)}#themeBar button.mode{width:auto;border-radius:22px;padding:0 14px;background:var(--bg2);color:var(--g);font-weight:700;font-size:15px;border:1px solid var(--line)}
 .lnk{background:var(--bg2);border:1px solid var(--line);color:var(--g);border-radius:12px;padding:10px 16px;font-weight:700;font-size:15px;margin:12px 0 0}.lnk:disabled{opacity:.35}
 .brow{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}.brow small{display:block;color:var(--tx);font-size:14px}.brow button{background:none;color:var(--tx);font-size:20px;padding:6px}
+details.grp{width:calc(100% - 44px);max-width:520px;margin:14px auto;padding:2px 18px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;color:var(--tx)}
+details.grp>summary{list-style:none;cursor:pointer;padding:14px 0;font-size:21px;font-weight:700;color:var(--g)}details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::after{content:'▾';float:right;color:var(--tx)}details.grp[open]>summary::after{content:'▴'}
+details.grp>summary small{display:block;font-size:14px;font-weight:400;color:var(--tx);margin-top:3px;padding-right:24px}
+details.grp .sec{padding:4px 0 14px;margin:0;max-width:none}details.grp .sec+.sec{border-top:1px solid var(--line);padding-top:18px}details.grp .in{margin-top:0}
+.two,.tsel{grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}.tsel{--n:3}
+.two>*,.tsel>*,.grid>*{min-width:0}
+.in,select.in,textarea.in{max-width:100%;min-width:0}
+details.grp{overflow:hidden;overflow-wrap:anywhere}details.grp .tog{gap:14px}details.grp .tog>div{min-width:0}details.grp .tog input{flex:none}
+details.grp .go,details.grp .lnk{max-width:100%}
+input,select,textarea,.in{box-sizing:border-box}.in{width:100%}
+details.grp>summary{position:relative;padding-right:30px}details.grp>summary::after{position:absolute;right:0;top:14px;float:none}
+main details.grp{width:100%;max-width:none;margin:16px 0}
+main details.grp .goal{margin:8px 0 6px;border-radius:14px;padding:26px 20px}
+main details.grp .stats{margin:10px 0 14px}main details.grp .stack{margin:6px 0 14px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
 .toast.on{opacity:1}
 </style></head><body>
@@ -94,20 +109,23 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <button class="go" id="startBtn">Arm timer</button><div id="armed"></div></details>
 <div class="grid"><button class="b pause" id="bPause">Start</button><button class="b brk" id="bBreak">Break · 30 min</button><button class="b rst" id="bReset">Reset</button><button class="b sv" id="bSave">Save Shift</button></div>
 
+<details class="grp" data-k="goal"><summary>Goal<small class="gs"></small></summary>
 <div class="goal"><div><div class="lab" id="goalLab">10-hour goal</div><b id="goalAmt">$0.00</b><p id="goalTxt"></p></div></div>
 <div style="display:flex;justify-content:space-between;color:var(--g);margin-top:26px;font-size:20px"><span id="goalEarned">$0.00 earned</span><span id="goalPct">0%</span></div>
-<div class="bar"><i id="goalBar"></i></div>
+<div class="bar"><i id="goalBar"></i></div></details>
 
+<details class="grp" data-k="stats"><summary>Stats<small class="gs"></small></summary>
 <div class="stats">
 <div><div class="lab">This week</div><b id="wkAmt">$0.00</b><span id="wkHrs">0.0 hrs</span></div>
 <div><div class="lab">All time</div><b id="allAmt">$0.00</b><span id="allHrs">0.0 hrs</span></div>
 <div><div class="lab">Week shifts</div><b id="wkN">0</b></div>
-<div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div>
+<div><div class="lab">Avg / shift</div><b id="avg">$0.00</b></div></div></details>
 
-<div class="stack"><div class="lab">Paycheck stack</div><div id="payRange" style="font-size:15px;margin-top:6px"></div>
+<details class="grp" data-k="stack"><summary>Paycheck stack<small class="gs"></small></summary>
+<div class="stack"><div id="payRange" style="font-size:15px;margin-top:6px"></div>
 <div id="stackImg"></div><div id="stackLegend" style="margin-top:14px;font-size:15px"></div>
-<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="lnk" id="sumBtn">Weekly summary</button><button class="lnk" id="taxBtn">Add tax estimate</button><button class="lnk" id="budBtn">💰 Budget</button></div>
-<b id="stackAmt">$0.00</b></div>
+<b id="stackAmt">$0.00</b></div></details>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px"><button class="lnk" id="sumBtn">Weekly summary</button><button class="lnk" id="taxBtn">Add tax estimate</button><button class="lnk" id="budBtn">💰 Budget</button></div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:50px"><h2 style="font-size:32px">Saved Shifts</h2><button class="link" id="clearAll">CLEAR ALL</button></div>
 <div id="list"></div>
@@ -123,11 +141,11 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><b id="otWorked" style="color:var(--g);font-size:32px">0h 00m worked</b><span id="otLeft" style="font-size:18px;color:var(--gb)"></span></div>
 <div class="bar"><i id="otBar"></i></div>
 <small class="n" id="otNote"></small></div>
-<div class="sec"><h2>Take-home estimate</h2><p>Enter a rough combined tax percentage (federal, state, Social Security and Medicare). Your pay stub shows what is really withheld.</p><div class="lab">Estimated taxes (%)</div><input class="in" type="number" id="optTax" step="0.5" min="0" max="60" placeholder="e.g. 20" style="font-size:22px;margin-top:10px"></div>
-<div class="sec"><h2>Shift notes</h2><p>Jot down what you worked on — it attaches when you save the shift.</p>
-<textarea class="in" id="notes" rows="4" style="font-size:18px" placeholder="e.g. Covered the front counter, trained the new hire…"></textarea>
-<small class="n">Saved automatically and cleared once the shift is saved.</small></div>
-<div class="sec"><h2>Add a missed punch</h2><p>Forgot to start or stop the timer? Log that shift by hand.</p>
+<details class="grp" data-k="pay"><summary>Pay &amp; overtime<small class="gs"></small></summary><div class="sec"><h2>Take-home estimate</h2><p>Enter a rough combined tax percentage (federal, state, Social Security and Medicare). Your pay stub shows what is really withheld.</p><div class="lab">Estimated taxes (%)</div><input class="in" type="number" id="optTax" step="0.5" min="0" max="60" placeholder="e.g. 20" style="font-size:22px;margin-top:10px"></div>
+<div class="sec" style="padding-bottom:60px"><div class="tog"><div><h3>Overtime pay</h3><p>Extra rate after the weekly hours below.</p></div><input type="checkbox" id="optOT" checked></div>
+<div class="two"><div><div class="lab">After (hrs/wk)</div><input class="in" type="number" id="otAfter" value="40" style="font-size:22px;margin-top:10px"></div>
+<div><div class="lab">Rate multiplier</div><input class="in" type="number" step="0.1" id="otMult" value="1.5" style="font-size:22px;margin-top:10px"></div></div></div></details>
+<details class="grp" data-k="shift"><summary>Add a shift<small class="gs"></small></summary><div class="sec"><h2>Add a missed punch</h2><p>Forgot to start or stop the timer? Log that shift by hand.</p>
 <div class="lab">Clocked in</div><input class="in" type="date" id="inD" style="font-size:20px;margin-top:10px"><input class="in" type="time" id="inT" style="font-size:20px">
 <div class="lab" style="margin-top:20px">Clocked out</div><input class="in" type="date" id="outD" style="font-size:20px;margin-top:10px"><input class="in" type="time" id="outT" style="font-size:20px">
 <div class="lab" style="margin-top:20px">Unpaid break (min)</div><input class="in" type="number" id="mBrk" value="0" style="font-size:20px;margin-top:10px">
@@ -137,8 +155,19 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div class="lab" style="margin-top:20px">Date</div><input class="in" type="date" id="pD" style="font-size:20px;margin-top:10px">
 <div class="two" style="margin-top:20px"><div><div class="lab">Hours</div><input class="in" type="number" step="0.25" id="pH" value="8" style="font-size:20px;margin-top:10px"></div><div><div class="lab">Hourly rate</div><input class="in" type="number" step="0.01" id="pR" style="font-size:20px;margin-top:10px"></div></div>
 <button class="go" id="addPto">Add PTO</button></div>
-<div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
-<div class="sec"><h2>Setup</h2><p>Change your hourly rate, overtime rules, and tax estimate in one place.</p><button class="go" id="suAgain" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Open setup</button></div>
+</details>
+<details class="grp" data-k="notes"><summary>Shift notes<small class="gs"></small></summary><div class="sec"><p>Jot down what you worked on — it attaches when you save the shift.</p>
+<textarea class="in" id="notes" rows="4" style="font-size:18px" placeholder="e.g. Covered the front counter, trained the new hire…"></textarea>
+<small class="n">Saved automatically and cleared once the shift is saved.</small></div>
+</details>
+<details class="grp" data-k="alerts"><summary>Alerts &amp; widgets<small class="gs"></small></summary><div class="sec"><p>Keep your “to go” amount on the home-screen app icon while you work.</p>
+<div class="tog"><div><h3>Goal on app icon</h3><p>Shows whole dollars left to a 10-hour shift.</p></div><input type="checkbox" id="optBadge" checked></div>
+<div class="tog"><div><h3>Live notification</h3><p>Keeps “$ to go” and time left in your notification shade while a shift runs.</p></div><input type="checkbox" id="optLive"></div>
+<div class="tog"><div><h3>Notify at goal</h3><p>A one-time alert when you hit the full shift.</p></div><input type="checkbox" id="optNotify" checked></div>
+<button class="go" id="pipBtn">Open floating countdown</button><small class="n">Shows money to go and time to go in a small window that floats over other apps. Tapping the TO GO box at the top does the same.</small>
+<small class="n">App icons can only show a number, so the icon badge carries dollars left. The live notification carries dollars and time left. A website can’t draw a true home-screen widget. The app icon badge needs Shift Watch installed to your home screen. Notifications need permission and only arrive while the app is open or in the background.</small></div>
+</details>
+<details class="grp" data-k="backup"><summary>Backup &amp; setup<small class="gs"></small></summary><div class="sec"><h2>Setup</h2><p>Change your hourly rate, overtime rules, and tax estimate in one place.</p><button class="go" id="suAgain" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Open setup</button></div>
 <div class="sec"><h2>Backup &amp; restore</h2><p>Your shifts live only in this browser. Save a backup so you can move to a new phone or recover after clearing data.</p>
 <button class="go" id="bkExport">Export to file</button>
 <button class="go" id="bkCopy" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Copy backup text</button>
@@ -146,17 +175,12 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <textarea class="in" id="bkText" rows="3" style="font-size:15px;margin-top:14px" placeholder="Or paste backup text here"></textarea>
 <button class="go" id="bkPaste" style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Restore from pasted text</button>
 <small class="n">If your browser blocks downloads, use Copy backup text and paste it into a note. Importing adds shifts that aren’t already in the app and restores the settings in the backup.</small></div>
+</details>
+<details class="grp" data-k="about"><summary>About &amp; support<small class="gs"></small></summary><div class="sec"><h2>Share Shift Watch</h2><p>Send it to a coworker or a friend who tracks their hours.</p><button class="go" id="shareApp">Share the app</button></div>
 <div class="sec"><h2>More apps</h2><p>Check out my other apps and games.</p><a class="go" href="https://keyek302.github.io" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Visit keyek302.github.io</a></div>
 <div class="sec"><h2>Support Shift Watch</h2><p>If it helps you track your hours, you can buy me a coffee. More apps at <a href="https://keyek302.github.io" target="_blank" rel="noopener" style="color:var(--gb);font-weight:500">keyek302.github.io</a>.</p><a class="go or" href="https://buymeacoffee.com/keyek" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Buy me a coffee</a></div>
-<div class="sec"><h2>Goal widget</h2><p>Keep your “to go” amount on the home-screen app icon while you work.</p>
-<div class="tog"><div><h3>Goal on app icon</h3><p>Shows whole dollars left to a 10-hour shift.</p></div><input type="checkbox" id="optBadge" checked></div>
-<div class="tog"><div><h3>Live notification</h3><p>Keeps “$ to go” and time left in your notification shade while a shift runs.</p></div><input type="checkbox" id="optLive"></div>
-<div class="tog"><div><h3>Notify at goal</h3><p>A one-time alert when you hit the full shift.</p></div><input type="checkbox" id="optNotify" checked></div>
-<button class="go" id="pipBtn">Open floating countdown</button><small class="n">Shows money to go and time to go in a small window that floats over other apps. Tapping the TO GO box at the top does the same.</small>
-<small class="n">App icons can only show a number, so the icon badge carries dollars left. The live notification carries dollars and time left. A website can’t draw a true home-screen widget. The app icon badge needs Shift Watch installed to your home screen. Notifications need permission and only arrive while the app is open or in the background.</small></div>
-<div class="sec" style="padding-bottom:60px"><div class="tog"><div><h3>Overtime pay</h3><p>Extra rate after the weekly hours below.</p></div><input type="checkbox" id="optOT" checked></div>
-<div class="two"><div><div class="lab">After (hrs/wk)</div><input class="in" type="number" id="otAfter" value="40" style="font-size:22px;margin-top:10px"></div>
-<div><div class="lab">Rate multiplier</div><input class="in" type="number" step="0.1" id="otMult" value="1.5" style="font-size:22px;margin-top:10px"></div></div></div>
+</details>
+<div style="height:50px"></div>
 </div>
 <div class="modal" id="editModal"><div class="mh"><h2>Edit shift</h2><button id="eClose" aria-label="Close">✕</button></div>
 <div class="sec"><div class="lab">Clocked in</div><input class="in" type="date" id="eInD" style="font-size:20px;margin-top:10px"><div class="tsel" id="eInT"></div>
@@ -183,21 +207,23 @@ details.wk{margin:14px 0;padding:14px 16px;color:var(--tx)}details.wk summary{co
 <div class="sec"><div class="lab" id="budRange"></div>
 <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px"><div id="budGoalBox"></div><div id="budSum"></div></div>
 <small class="n" id="budNote"></small></div>
-<div class="sec"><h2>Bill calendar</h2><div class="lab">Payday</div><select class="in" id="payDay" style="font-size:20px;margin-top:10px"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select>
+<details class="grp" data-k="cal"><summary>Bill calendar<small class="gs"></small></summary><div class="sec"><div class="lab">Payday</div><select class="in" id="payDay" style="font-size:20px;margin-top:10px"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select>
 <div id="calWarn" style="margin-top:14px"></div><div id="calGrid" style="margin-top:14px"></div>
 <small class="n">Red days have bills due before your next payday. 💵 marks payday. Weekly bills with no set day count on payday.</small><div id="calList"></div></div>
-<div class="sec"><h2>Bills</h2><div id="billList"></div>
+</details>
+<details class="grp" data-k="bills"><summary>Bills<small class="gs"></small></summary><div class="sec"><div id="billList"></div>
 <div class="lab" style="margin-top:18px" id="billFormT">Add a bill</div>
 <input class="in" id="bName" placeholder="Name (e.g. Rent)" style="font-size:20px;margin-top:10px">
 <div class="two" style="margin-top:12px"><input class="in" type="number" step="0.01" id="bAmt" placeholder="Amount" style="font-size:20px"><select class="in" id="bFreq" style="font-size:20px"><option value="weekly">Every week</option><option value="monthly">Monthly</option></select></div>
 <select class="in" id="bWd" style="font-size:18px;margin-top:12px"><option value="">Any day (counts on payday)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select>
 <input class="in" type="number" id="bDay" min="1" max="31" placeholder="Day of the month it’s due (1-31)" style="font-size:18px;margin-top:12px" hidden>
 <button class="go" id="bAdd">Add bill</button><button class="go" id="bCancel" hidden style="background:var(--bg2);color:var(--g);border:1px solid var(--line)">Cancel edit</button></div>
-<div class="sec" style="padding-bottom:60px"><h2>Spending</h2><p>Log purchases to see what is left this week.</p>
+</details>
+<details class="grp" data-k="spend"><summary>Spending<small class="gs"></small></summary><div class="sec" style="padding-bottom:60px"><p>Log purchases to see what is left this week.</p>
 <input class="in" type="number" step="0.01" id="sAmt" placeholder="Amount" style="font-size:20px"><small class="n" id="sHrs"></small>
 <input class="in" id="sNote" placeholder="What for? (optional)" style="font-size:18px;margin-top:6px">
-<button class="go" id="sAdd">Log spending</button><div id="spendList" style="margin-top:16px"></div></div>
-
+<button class="go" id="sAdd">Log spending</button><div id="spendList" style="margin-top:16px"></div></div></details>
+<div style="height:50px"></div>
 </div>
 <div class="modal" id="goalM"><div class="mh"><h2>Savings goals</h2><button id="goalClose" aria-label="Close">✕</button></div>
 <div class="sec" style="padding-bottom:60px"><h2>Savings goals</h2><div id="goalList"></div>
@@ -254,13 +280,14 @@ function render(){
  const wr=S.shifts.filter(s=>!s.pto);$('wkN').textContent=wk.filter(s=>!s.pto).length;$('avg').textContent=money(wr.length?sum(wr)/wr.length:0);
  const t=ms=>new Date(ms).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  const d=ms=>new Date(ms).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
- $('list').innerHTML='';const grp={};
+ $('list').innerHTML='';const grp={};let wkCount=0,olderB=null,olderS=null;
+ const getOlder=()=>{if(!olderB){const d=document.createElement('details');d.className='wk';d.open=!!openWk.older;d.ontoggle=()=>{openWk.older=d.open};const sm=document.createElement('summary');olderS=document.createElement('small');sm.textContent='Older weeks';sm.append(olderS);olderB=document.createElement('div');d.append(sm,olderB);$('list').append(d)}return olderB};
  const fm=ms=>new Date(ms).toLocaleDateString('en-US',{month:'long',day:'numeric'});
  const wkBody=ms=>{const w=weekStart(ms);if(!grp[w]){const we=new Date(w);we.setDate(we.getDate()+6);const inW=S.shifts.filter(q=>weekStart(q.start)===w);
   const d=document.createElement('details');d.className='wk';d.open=openWk[w]!==undefined?openWk[w]:w===ws;d.ontoggle=()=>{openWk[w]=d.open};
   const sm=document.createElement('summary'),sub=document.createElement('small');sm.textContent=fm(w)+' – '+fm(we.getTime());
   sub.textContent=money(inW.reduce((t,q)=>t+q.pay,0))+' · '+(inW.reduce((t,q)=>t+q.worked,0)/3600000).toFixed(1)+' hrs';sm.append(sub);
-  const b=document.createElement('div'),sb=document.createElement('button');sb.className='lnk';sb.textContent='📤 Weekly summary';sb.onclick=()=>openSummary(w);b.append(sb);d.append(sm,b);$('list').append(d);grp[w]={b}}return grp[w].b};
+  const b=document.createElement('div'),sb=document.createElement('button');sb.className='lnk';sb.textContent='📤 Weekly summary';sb.onclick=()=>openSummary(w);b.append(sb);d.append(sm,b);(wkCount++<4?$('list'):getOlder()).append(d);grp[w]={b}}return grp[w].b};
  [...S.shifts].sort((a,b)=>b.start-a.start).forEach(s=>{
   const el=document.createElement('div');el.className='shift';
   const l=document.createElement('div');
@@ -272,6 +299,7 @@ function render(){
   const x=document.createElement('button');x.className='del';x.textContent='🗑';x.setAttribute('aria-label','Delete shift');
   x.onclick=async()=>{if(await ask('Delete this shift?')){S.shifts=S.shifts.filter(q=>q.id!==s.id);save();render()}};
   const ed=document.createElement('button');ed.className='del';ed.textContent='✎';ed.setAttribute('aria-label','Edit shift');ed.onclick=()=>openEdit(s);el.append(l,a,ed,x);wkBody(s.start).append(el)});
+ if(olderS){const n=wkCount-4;olderS.textContent=n+' more week'+(n===1?'':'s')+' · tap to open'}
  if(!S.shifts.length){$('list').innerHTML='<p>No saved shifts yet. Start the timer to log your first one.</p>'}
  tick();
 }
@@ -357,7 +385,7 @@ $('bSave').onclick=()=>{
 $('clearAll').onclick=async()=>{if(S.shifts.length&&await ask('Delete all saved shifts?')){S.shifts=[];save();render()}};
 $('rate').oninput=()=>{S.rate=$('rate').value;save();tick()};
 $('notes').oninput=()=>{S.notes=$('notes').value;save()};
-const open=()=>{$('modal').classList.add('on')};
+const open=()=>{grpSums();$('modal').classList.add('on')};
 $('bMenu').onclick=open;$('mClose').onclick=()=>$('modal').classList.remove('on');
 
 async function share(){const d={title:'Shift Watch',text:'Track your hours and see what you earn.',url:location.href.split('#')[0]};
@@ -457,7 +485,7 @@ const fmd=ms=>new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeri
 function tkLine(total){const t=S.opt.tax||0;return t>0?'<div style="margin-top:10px;font-size:15px">Est. take-home <span style="font-weight:700;color:var(--hi)">'+money(total*(1-t/100))+'</span> after '+t+'% taxes</div>':''}
 function refreshOpts(){[['optBadge','badge'],['optLive','live'],['optNotify','notify'],['optOT','ot'],['otAfter','otAfter'],['otMult','otMult'],['optTax','tax']].forEach(([id,k])=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!S.opt[k];else e.value=S.opt[k]==null?'':S.opt[k]})}
 $('optTax').onchange=()=>{S.opt.tax=Math.max(0,Math.min(60,parseFloat($('optTax').value)||0));$('optTax').value=S.opt.tax||'';save();tick()};
-$('taxBtn').onclick=()=>{open();setTimeout(()=>{const e=$('optTax');e.scrollIntoView({block:'center'});e.focus()},80)};
+$('taxBtn').onclick=()=>{open();gOpen('pay');setTimeout(()=>{const e=$('optTax');e.scrollIntoView({block:'center'});e.focus()},80)};
 function openSetup(){$('suRate').value=$('rate').value;$('suOT').checked=!!S.opt.ot;$('suAfter').value=S.opt.otAfter||40;$('suMult').value=S.opt.otMult||1.5;$('suTax').value=S.opt.tax||'';$('setupM').classList.add('on')}
 $('suAgain').onclick=()=>{$('modal').classList.remove('on');openSetup()};
 $('suSkip').onclick=()=>{S.setupDone=true;save();$('setupM').classList.remove('on')};
@@ -498,7 +526,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const sm=n=>(n<0?'−':'')+money(Math.abs(n)),ord=n=>{const v=n%100;return v>=11&&v<=13?'th':({1:'st',2:'nd',3:'rd'}[n%10]||'th')};
 function billsIn(w){const we=new Date(w);we.setDate(we.getDate()+7);const out=[];
  S.budget.bills.forEach(b=>{if(b.freq==='weekly')out.push({b});else for(let d=new Date(w);d<we;d.setDate(d.getDate()+1)){const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();if(d.getDate()===Math.min(b.day||1,dim))out.push({b})}});return out}
-function budSum(){budGoalBox();const ws=weekStart(Date.now()),we=new Date(ws);we.setDate(we.getDate()+6);
+function budSum(){budGoalBox();setTimeout(grpSums,0);const ws=weekStart(Date.now()),we=new Date(ws);we.setDate(we.getDate()+6);
  const dueT=billsIn(ws).reduce((t,x)=>t+x.b.amt,0),nw=new Date(ws);nw.setDate(nw.getDate()+7);const nextT=billsIn(nw.getTime()).reduce((t,x)=>t+x.b.amt,0);
  const spent=S.budget.spend.filter(x=>x.ts>=ws).reduce((t,x)=>t+x.amt,0),tax=S.opt.tax||0,take=lastPTot*(1-tax/100),left=take-dueT-spent,dl=7-new Date().getDay();
  const row=(a,b,c)=>'<div style="display:flex;justify-content:space-between;gap:10px;margin:8px 0"><span>'+a+'</span><span style="font-weight:700;color:'+(c||'var(--hi)')+'">'+b+'</span></div>';
@@ -516,7 +544,7 @@ function budLists(){budCal();const bl=$('billList'),sl=$('spendList'),ws=weekSta
   el.innerHTML='<div><span style="font-weight:700;color:var(--hi)">'+esc(x.note||'Spending')+'</span><small>'+new Date(x.ts).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+(netRate()>0?' · '+hmf(x.amt/netRate())+' of work':'')+'</small></div><div style="display:flex;align-items:center;gap:2px"><span style="font-weight:700;color:var(--hi)">'+money(x.amt)+'</span><button aria-label="Delete">🗑</button></div>';
   el.querySelector('button').onclick=()=>{S.budget.spend=S.budget.spend.filter(q=>q.id!==x.id);save();budLists();budSum()};sl.append(el)})}
 function resetBillForm(){billEdit=null;$('bName').value='';$('bAmt').value='';$('bDay').value='';$('bFreq').value='weekly';$('bDay').hidden=true;$('bWd').value='';$('bWd').hidden=false;$('bAdd').textContent='Add bill';$('bCancel').hidden=true;$('billFormT').textContent='Add a bill'}
-function editBill(b){billEdit=b.id;$('bName').value=b.name;$('bAmt').value=b.amt;$('bFreq').value=b.freq;$('bDay').value=b.freq==='monthly'?b.day:'';$('bDay').hidden=b.freq!=='monthly';$('bWd').value=Number.isInteger(b.wd)?b.wd:'';$('bWd').hidden=b.freq==='monthly';$('bAdd').textContent='Save bill';$('bCancel').hidden=false;$('billFormT').textContent='Edit bill';$('bName').scrollIntoView({block:'center'})}
+function editBill(b){gOpen('bills');billEdit=b.id;$('bName').value=b.name;$('bAmt').value=b.amt;$('bFreq').value=b.freq;$('bDay').value=b.freq==='monthly'?b.day:'';$('bDay').hidden=b.freq!=='monthly';$('bWd').value=Number.isInteger(b.wd)?b.wd:'';$('bWd').hidden=b.freq==='monthly';$('bAdd').textContent='Save bill';$('bCancel').hidden=false;$('billFormT').textContent='Edit bill';$('bName').scrollIntoView({block:'center'})}
 $('bFreq').onchange=()=>{const m=$('bFreq').value==='monthly';$('bDay').hidden=!m;$('bWd').hidden=m};$('bCancel').onclick=resetBillForm;
 $('bAdd').onclick=()=>{const name=$('bName').value.trim(),amt=parseFloat($('bAmt').value),freq=$('bFreq').value,dv=parseInt($('bDay').value);
  if(!name||!(amt>0))return toast('Enter a name and an amount');if(freq==='monthly'&&!(dv>=1&&dv<=31))return toast('Enter the day of the month it is due');
@@ -567,5 +595,20 @@ function budGoalBox(){const gs=S.budget.goals,el=$('budGoalBox');
 $('budGoalBox').onclick=()=>$('goalBtn').click();
 $('goalBtn').onclick=()=>{budGoals();$('goalM').classList.add('on')};$('goalClose').onclick=()=>{$('goalM').classList.remove('on');budSum()};
 $('budBtn').onclick=()=>{budLists();budSum();budGoals();$('budM').classList.add('on')};$('budClose').onclick=()=>$('budM').classList.remove('on');
+S.openG=S.openG||{};
+function gOpen(k){const d=document.querySelector('details.grp[data-k="'+k+'"]');if(d&&!d.open)d.open=true}
+document.querySelectorAll('details.grp').forEach(d=>{const k=d.dataset.k;if(S.openG[k])d.open=true;d.ontoggle=()=>{S.openG[k]=d.open;save()}});
+function gs(k,t){const e=document.querySelector('details.grp[data-k="'+k+'"] .gs');if(e&&e.textContent!==t)e.textContent=t}
+function grpSums(){const o=S.opt;
+ gs('pay',(o.ot?'Overtime after '+o.otAfter+'h at '+o.otMult+'×':'Overtime pay off')+((o.tax||0)>0?' · taxes '+o.tax+'%':''));
+ gs('goal',$('toGo').textContent+' to go · '+$('goalPct').textContent);gs('stats','This week '+$('wkAmt').textContent+' · All time '+$('allAmt').textContent);gs('stack',$('stackAmt').textContent+' · '+$('payRange').textContent);
+ gs('shift','Missed punch · Vacation / PTO');
+ gs('notes',S.notes&&S.notes.trim()?'Note saved for this shift':'No note yet');
+ gs('alerts','Icon badge '+(o.badge?'on':'off')+' · Live notification '+(o.live?'on':'off'));
+ gs('backup','Export · Import · Setup');gs('about','Share · More apps · Coffee');
+ const w=$('calWarn').textContent,m=w.match(/⚠ (\d+) bill/);gs('cal',m?'⚠ '+m[1]+' bill'+(m[1]==='1'?'':'s')+' due before payday':w.startsWith('✓')?'✓ Clear until payday':'No bills yet');
+ const ws=weekStart(Date.now()),due=billsIn(ws).reduce((t,x)=>t+x.b.amt,0),n=S.budget.bills.length;gs('bills',n?n+' bill'+(n===1?'':'s')+' · '+money(due)+' due this week':'No bills yet');
+ gs('spend',money(S.budget.spend.filter(x=>x.ts>=ws).reduce((t,x)=>t+x.amt,0))+' logged this week')}
+grpSums();setInterval(grpSums,1000);
 render();setInterval(tick,1000);
 </script></body></html>
